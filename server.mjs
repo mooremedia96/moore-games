@@ -3,6 +3,7 @@ import express from "express";
 
 const app = express();
 const PORT = 3001;
+const TEST_FEATURE = "twitch";
 
 const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@mooregames96";
 
@@ -292,7 +293,31 @@ app.get("/api/dashboard", async (request, response) => {
 
         let featuredContent = null;
 
-        if (twitch.live) {
+        if (TEST_FEATURE === "twitch") {
+            featuredContent = {
+                type: "live",
+                platform: "twitch",
+                title: "Moore Games Test Stream",
+                subtitle: "Playing Where Winds Meet",
+                thumbnail:
+                    latestVideo?.thumbnail ||
+                    "/banner.jpeg",
+                url: `https://www.twitch.tv/${TWITCH_USERNAME}`,
+                viewers: 12,
+            };
+        } else if (TEST_FEATURE === "youtube") {
+            featuredContent = {
+                type: "live",
+                platform: "youtube",
+                title: "Moore Games YouTube Live Test",
+                subtitle: "Watch the live stream",
+                thumbnail:
+                    latestVideo?.thumbnail ||
+                    "/banner.jpeg",
+                url: YOUTUBE_CHANNEL_URL,
+                viewers: null,
+            };
+        } else if (twitch.live) {
             featuredContent = {
                 type: "live",
                 platform: "twitch",

@@ -55,54 +55,48 @@ body {
     pointer-events: none;
 
     background:
-        radial-gradient(
-            circle at 50% 25%,
+        radial-gradient(circle at 50% 25%,
             rgba(0, 50, 120, 0.08),
-            transparent 38%
-        ),
-        linear-gradient(
-            to bottom,
+            transparent 38%),
+        linear-gradient(to bottom,
             rgba(0, 0, 0, 0.12),
-            rgba(0, 0, 0, 0.72)
-        );
+            rgba(0, 0, 0, 0.72));
 }
 
 .site-card {
-  position: relative;
-  z-index: 1;
+    position: relative;
+    z-index: 1;
 
-  width: min(100%, 760px);
-  margin: 0 auto;
-  min-height: 100vh;
+    width: min(100%, 760px);
+    margin: 0 auto;
+    min-height: 100vh;
 
-  background: rgba(0, 0, 0, 0.38);
-  border-left: 1px solid rgba(20, 112, 255, 0.28);
-  border-right: 1px solid rgba(20, 112, 255, 0.28);
-  backdrop-filter: blur(2px);
+    background: rgba(0, 0, 0, 0.38);
+    border-left: 1px solid rgba(20, 112, 255, 0.28);
+    border-right: 1px solid rgba(20, 112, 255, 0.28);
+    backdrop-filter: blur(2px);
 }
 
 .hero {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
 }
 
 .hero img {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
 }
 
 .hero-shade {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    transparent 60%,
-    rgba(0, 0, 0, 0.82) 100%
-  );
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(to bottom,
+            transparent 60%,
+            rgba(0, 0, 0, 0.82) 100%);
 }
 
 .profile {
@@ -176,6 +170,217 @@ h1 {
     color: #d2d7df;
     font-size: 14px;
     line-height: 1.5
+}
+
+.featured-content {
+    width: min(520px, calc(100% - 30px));
+    margin: 5px auto 18px;
+}
+
+.featured-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 9px;
+    padding: 0 3px;
+}
+
+.featured-heading>span:first-child {
+    color: #1687ff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2.8px;
+}
+
+.featured-live-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #ff4242;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.featured-live-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #ff2727;
+    box-shadow: 0 0 12px rgba(255, 39, 39, 0.9);
+    animation: featured-live-pulse 1.4s ease-in-out infinite;
+}
+
+.featured-card {
+    display: block;
+    overflow: hidden;
+    color: #fff;
+    text-decoration: none;
+    border: 1px solid #0d7bff;
+    border-radius: 14px;
+    background: rgba(0, 3, 12, 0.94);
+    box-shadow: 0 0 20px rgba(0, 96, 255, 0.25);
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.featured-card:hover {
+    transform: translateY(-3px);
+    border-color: #53baff;
+    box-shadow: 0 0 28px rgba(0, 115, 255, 0.48);
+}
+
+.featured-thumbnail {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #020610;
+}
+
+.featured-thumbnail img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+}
+
+.featured-card:hover .featured-thumbnail img {
+    transform: scale(1.025);
+}
+
+.featured-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(to top,
+            rgba(0, 0, 0, 0.65),
+            transparent 58%),
+        radial-gradient(circle at center,
+            transparent 25%,
+            rgba(0, 0, 0, 0.12));
+}
+
+.featured-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s ease;
+}
+
+.featured-card:hover .featured-play {
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+.featured-play.is-youtube {
+    background: rgba(255, 0, 0, 0.92);
+    box-shadow: 0 0 22px rgba(255, 0, 0, 0.55);
+}
+
+.featured-play.is-twitch {
+    background: rgba(100, 65, 201, 0.94);
+    box-shadow: 0 0 22px rgba(100, 65, 201, 0.7);
+}
+
+.featured-play span {
+    width: 0;
+    height: 0;
+    margin-left: 4px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 13px solid #fff;
+}
+
+.featured-live-badge {
+    position: absolute;
+    left: 12px;
+    bottom: 11px;
+    padding: 5px 9px;
+    border-radius: 6px;
+    color: #fff;
+    background: rgba(220, 0, 0, 0.92);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.featured-copy {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 74px;
+    padding: 12px 15px;
+}
+
+.featured-copy>div {
+    min-width: 0;
+    flex: 1;
+}
+
+.featured-copy strong {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 15px;
+    line-height: 1.35;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.featured-copy p {
+    margin: 6px 0 0;
+    color: #bbc3ce;
+    font-size: 12px;
+}
+
+.featured-copy small {
+    display: block;
+    margin-top: 5px;
+    color: #82c8ff;
+    font-size: 11px;
+}
+
+.featured-arrow {
+    color: #e7f5ff;
+    font-size: 32px;
+    font-weight: 200;
+    line-height: 1;
+}
+
+.featured-live .featured-card {
+    border-color: rgba(255, 45, 45, 0.85);
+    box-shadow:
+        0 0 25px rgba(255, 30, 30, 0.3),
+        inset 0 0 18px rgba(255, 30, 30, 0.04);
+}
+
+.featured-twitch.featured-live .featured-card {
+    border-color: rgba(145, 105, 255, 0.95);
+    box-shadow:
+        0 0 26px rgba(100, 65, 201, 0.5),
+        inset 0 0 18px rgba(100, 65, 201, 0.08);
+}
+
+@keyframes featured-live-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.35);
+        opacity: 0.65;
+    }
 }
 
 .links-panel {
@@ -349,6 +554,7 @@ h1 {
 }
 
 @keyframes live-pulse {
+
     0%,
     100% {
         transform: scale(1);
@@ -486,6 +692,25 @@ footer {
 
     .hero img {
         transform: scale(1.08);
+    }
+
+    .featured-content {
+        width: calc(100% - 28px);
+        margin-bottom: 16px;
+    }
+
+    .featured-play {
+        width: 50px;
+        height: 50px;
+    }
+
+    .featured-copy {
+        min-height: 68px;
+        padding: 11px 13px;
+    }
+
+    .featured-copy strong {
+        font-size: 14px;
     }
 
     .profile {
