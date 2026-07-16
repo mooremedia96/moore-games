@@ -3,7 +3,7 @@ import express from "express";
 
 const app = express();
 const PORT = 3001;
-const TEST_FEATURE = "twitch";
+const TEST_FEATURE = null;
 
 const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@mooregames96";
 
@@ -122,9 +122,11 @@ async function getTwitchStatus() {
         title: stream.title || "Moore Games is live on Twitch",
         game: stream.game_name || "",
         viewers: stream.viewer_count || 0,
-        thumbnail: stream.thumbnail_url
-            ?.replace("{width}", "640")
-            .replace("{height}", "360"),
+        startedAt: stream.started_at || "",
+        thumbnail:
+            stream.thumbnail_url
+                ?.replace("{width}", "640")
+                .replace("{height}", "360") || "",
         url: `https://www.twitch.tv/${TWITCH_USERNAME}`,
     };
 }
@@ -299,6 +301,10 @@ app.get("/api/dashboard", async (request, response) => {
                 platform: "twitch",
                 title: "Moore Games Test Stream",
                 subtitle: "Playing Where Winds Meet",
+                game: "Where Winds Meet",
+                startedAt: new Date(
+                    Date.now() - 34 * 60 * 1000
+                ).toISOString(),
                 thumbnail:
                     latestVideo?.thumbnail ||
                     "/banner.jpeg",
@@ -325,6 +331,8 @@ app.get("/api/dashboard", async (request, response) => {
                 subtitle: twitch.game
                     ? `Playing ${twitch.game}`
                     : "Watch the live stream",
+                game: twitch.game,
+                startedAt: twitch.startedAt,
                 thumbnail: twitch.thumbnail,
                 url: twitch.url,
                 viewers: twitch.viewers,
