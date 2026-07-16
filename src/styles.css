@@ -1,0 +1,561 @@
+:root {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #fff;
+    background: #000;
+    --blue: #1687ff;
+    --blue2: #0057d9;
+    --panel: #020610
+}
+
+* {
+    box-sizing: border-box
+}
+
+html,
+body,
+#root {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100%;
+    background: #000
+}
+
+body {
+    min-height: 100vh
+}
+
+.app-bg {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+    isolation: isolate;
+}
+
+.app-bg::before {
+    content: "";
+    position: fixed;
+    inset: -3%;
+    z-index: -2;
+
+    background-image: url("/space-bg.png");
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: cover;
+
+    filter: blur(4px) brightness(.72);
+    transform: scale(1.04);
+}
+
+.app-bg::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle at 50% 25%,
+            rgba(0, 50, 120, 0.08),
+            transparent 38%
+        ),
+        linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.12),
+            rgba(0, 0, 0, 0.72)
+        );
+}
+
+.site-card {
+  position: relative;
+  z-index: 1;
+
+  width: min(100%, 760px);
+  margin: 0 auto;
+  min-height: 100vh;
+
+  background: rgba(0, 0, 0, 0.38);
+  border-left: 1px solid rgba(20, 112, 255, 0.28);
+  border-right: 1px solid rgba(20, 112, 255, 0.28);
+  backdrop-filter: blur(2px);
+}
+
+.hero {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.hero img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.hero-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 60%,
+    rgba(0, 0, 0, 0.82) 100%
+  );
+}
+
+.profile {
+    position: relative;
+    text-align: center;
+    margin-top: -82px;
+    padding: 0 20px
+}
+
+.avatar-wrap {
+    position: relative;
+    width: 126px;
+    height: 126px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(145deg, #60caff, #126eff 52%, #0a2b68);
+    box-shadow: 0 0 0 4px #020711, 0 0 26px rgba(0, 118, 255, .95)
+}
+
+.avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center 53%;
+    display: block;
+    filter: contrast(1.05) saturate(1.08)
+}
+
+.avatar-wrap:after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, .8)
+}
+
+.online-dot {
+    position: absolute;
+    right: 1px;
+    bottom: 7px;
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    background: #18d87a;
+    border: 3px solid #06101e;
+    box-shadow: 0 0 14px rgba(24, 216, 122, .8)
+}
+
+h1 {
+    font-size: 29px;
+    line-height: 1.15;
+    margin: 0 0 7px;
+    font-weight: 800
+}
+
+.roles {
+    font-size: 14px;
+    color: #1f91ff
+}
+
+.roles span {
+    padding: 0 7px;
+    color: #1f91ff
+}
+
+.profile p {
+    max-width: 480px;
+    margin: 12px auto 18px;
+    color: #d2d7df;
+    font-size: 14px;
+    line-height: 1.5
+}
+
+.links-panel {
+    width: min(520px, calc(100% - 30px));
+    margin: 0 auto
+}
+
+.link-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 60px;
+    padding: 9px 15px;
+    margin: 10px 0;
+    text-decoration: none;
+    color: #fff;
+    border: 1px solid #0d7bff;
+    border-radius: 12px;
+    background: linear-gradient(100deg, rgba(4, 11, 27, .97), rgba(0, 3, 12, .96));
+    box-shadow: 0 0 16px rgba(0, 96, 255, .22), inset 0 0 20px rgba(0, 76, 180, .05);
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease
+}
+
+.link-card:hover {
+    transform: translateY(-2px);
+    border-color: #53baff;
+    box-shadow: 0 0 24px rgba(0, 115, 255, .46)
+}
+
+.brand-icon {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 43px;
+    border-radius: 10px
+}
+
+.brand-icon svg {
+    width: 30px;
+    height: 30px;
+    fill: currentColor
+}
+
+.brand-icon.youtube {
+    color: #fff;
+    background: #ff1515;
+    box-shadow: 0 0 15px rgba(255, 0, 0, .45)
+}
+
+.brand-icon.youtube .cut {
+    fill: #ff1515
+}
+
+.brand-icon.twitch {
+    color: #fff;
+    background: #6543c9;
+    border: 1px solid #9b7dff;
+    box-shadow: 0 0 15px rgba(106, 76, 255, .55)
+}
+
+.brand-icon.discord {
+    color: #fff;
+    background: #5865f2;
+    box-shadow: 0 0 15px rgba(88, 101, 242, .5)
+}
+
+.brand-icon.instagram {
+    color: #fff;
+    background: linear-gradient(135deg, #6a24d9, #df2b86 55%, #ff9d2d);
+    box-shadow: 0 0 15px rgba(234, 51, 142, .42)
+}
+
+.brand-icon.facebook {
+    color: #fff;
+    background: #1877f2;
+    box-shadow: 0 0 15px rgba(24, 119, 242, .45)
+}
+
+.link-copy {
+    display: flex;
+    flex-direction: column;
+    flex: 1
+}
+
+.link-copy strong {
+    font-size: 15px;
+    font-weight: 700
+}
+
+.link-copy small {
+    font-size: 12px;
+    color: #c8ced8;
+    margin-top: 4px
+}
+
+.chevron {
+    font-size: 32px;
+    font-weight: 200;
+    color: #e7f5ff;
+    line-height: 1
+}
+
+.stream-status {
+    display: block;
+    width: min(410px, calc(100% - 30px));
+    margin: 14px auto 0;
+    padding: 14px 16px 12px;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    border: 1px solid rgba(15, 111, 231, 0.7);
+    border-radius: 11px;
+    background: rgba(0, 3, 12, 0.85);
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.stream-status:hover {
+    transform: translateY(-2px);
+}
+
+.status-title {
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: #39a7ff;
+}
+
+.status-value {
+    margin-top: 8px;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    margin-right: 7px;
+    border-radius: 50%;
+}
+
+.is-offline .status-dot {
+    background: #ff2525;
+    box-shadow: 0 0 12px rgba(255, 37, 37, 0.75);
+}
+
+.is-live {
+    border-color: #18d87a;
+    box-shadow:
+        0 0 22px rgba(24, 216, 122, 0.35),
+        inset 0 0 18px rgba(24, 216, 122, 0.06);
+}
+
+.is-live .status-title {
+    color: #39ef98;
+}
+
+.is-live .status-dot {
+    background: #18d87a;
+    box-shadow: 0 0 14px rgba(24, 216, 122, 0.95);
+    animation: live-pulse 1.4s ease-in-out infinite;
+}
+
+.stream-status p {
+    margin: 7px 0 0;
+    font-size: 12px;
+    color: #bbc3ce;
+}
+
+@keyframes live-pulse {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.35);
+        opacity: 0.65;
+    }
+}
+
+.social-row {
+    display: flex;
+    justify-content: center;
+    gap: 17px;
+    margin: 15px auto 18px
+}
+
+.social-row a {
+    display: grid;
+    place-items: center;
+    width: 47px;
+    height: 47px;
+    border: 1px solid rgba(30, 116, 255, .65);
+    border-radius: 10px;
+    text-decoration: none;
+    background: rgba(0, 4, 14, .9);
+    box-shadow: 0 0 16px rgba(0, 79, 210, .16);
+    transition: .2s
+}
+
+.social-row a:hover {
+    transform: translateY(-2px);
+    border-color: #5bbfff
+}
+
+.social-row .brand-icon {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+    border-radius: 7px
+}
+
+.social-row .brand-icon svg {
+    width: 24px;
+    height: 24px
+}
+
+footer {
+    text-align: center;
+    color: #b4bbc5;
+    font-size: 12px;
+    padding-bottom: 19px
+}
+
+@media (min-width: 1200px) {
+    .app-bg::before {
+        background-size: cover;
+        background-position: center top;
+        transform: scale(1.02);
+    }
+}
+
+@media (min-width: 701px) and (max-width: 1199px) {
+    .app-bg::before {
+        background-size: cover;
+        background-position: center top;
+        transform: scale(1.06);
+    }
+}
+
+@media (max-width: 700px) {
+    .app-bg {
+        padding: 0;
+    }
+
+    .app-bg::before {
+        inset: -6%;
+        background-size: auto 100%;
+        background-position: center top;
+        filter: blur(3px) brightness(.68);
+        transform: scale(1.08);
+    }
+
+    .site-card {
+        border: 0;
+        border-radius: 0;
+        width: 100%;
+        min-height: 100vh;
+    }
+
+    .hero {
+        height: 235px;
+    }
+
+    .hero img {
+        object-position: center 49%;
+    }
+
+    .profile {
+        margin-top: -60px;
+    }
+
+    .avatar-wrap {
+        width: 110px;
+        height: 110px;
+    }
+
+    .links-panel {
+        width: calc(100% - 28px);
+    }
+
+    .link-card {
+        min-height: 62px;
+    }
+
+    .stream-status {
+        width: calc(100% - 28px);
+    }
+}
+
+@media (max-width: 430px) {
+    .app-bg::before {
+        inset: -8%;
+        background-size: auto 100%;
+        background-position: center top;
+        filter: blur(3px) brightness(.64);
+        transform: scale(1.10);
+    }
+
+    .hero {
+        height: 205px;
+    }
+
+    .hero img {
+        transform: scale(1.08);
+    }
+
+    .profile {
+        margin-top: -50px;
+        padding-inline: 12px;
+    }
+
+    .avatar-wrap {
+        width: 96px;
+        height: 96px;
+        margin-bottom: 13px;
+    }
+
+    .online-dot {
+        width: 19px;
+        height: 19px;
+    }
+
+    .profile h1 {
+        font-size: 27px;
+    }
+
+    .roles {
+        font-size: 13px;
+    }
+
+    .roles span {
+        padding: 0 4px;
+    }
+
+    .profile p {
+        font-size: 13px;
+        max-width: 340px;
+        margin-bottom: 16px;
+    }
+
+    .link-card {
+        min-height: 61px;
+        padding: 8px 13px;
+        gap: 12px;
+    }
+
+    .brand-icon {
+        width: 41px;
+        height: 41px;
+        flex-basis: 41px;
+    }
+
+    .link-copy strong {
+        font-size: 15px;
+    }
+
+    .link-copy small {
+        font-size: 12px;
+    }
+
+    .stream-status {
+        margin-top: 13px;
+    }
+
+    .social-row {
+        gap: 11px;
+    }
+
+    .social-row a {
+        width: 44px;
+        height: 44px;
+    }
+
+    footer {
+        padding-bottom: 24px;
+    }
+}
