@@ -4,6 +4,8 @@ import express from "express";
 const app = express();
 const PORT = 3001;
 
+const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@mooregames96";
+
 const {
     YOUTUBE_API_KEY,
     YOUTUBE_CHANNEL_ID = "UCMU9AQML1qV7Y1RJpc5lR9Q",
@@ -14,6 +16,29 @@ const {
 
 let twitchToken = null;
 let twitchTokenExpiresAt = 0;
+
+function getDefaultTwitchStatus() {
+    return {
+        live: false,
+        platform: "twitch",
+        title: "",
+        game: "",
+        viewers: 0,
+        thumbnail: "",
+        url: `https://www.twitch.tv/${TWITCH_USERNAME}`,
+    };
+}
+
+function getDefaultYouTubeLiveStatus() {
+    return {
+        live: false,
+        platform: "youtube",
+        title: "",
+        videoId: "",
+        thumbnail: "",
+        url: YOUTUBE_CHANNEL_URL,
+    };
+}
 
 async function getTwitchToken() {
     const now = Date.now();
@@ -40,14 +65,15 @@ async function getTwitchToken() {
     );
 
     if (!response.ok) {
-        throw new Error(`Twitch token request failed: ${response.status}`);
+        throw new Error(
+            `Twitch token request failed: ${response.status}`
+        );
     }
 
     const data = await response.json();
 
     twitchToken = data.access_token;
 
-    // Refresh slightly before Twitch says the token expires.
     twitchTokenExpiresAt =
         Date.now() + Math.max(data.expires_in - 300, 60) * 1000;
 
@@ -55,16 +81,7 @@ async function getTwitchToken() {
 }
 
 async function getTwitchStatus() {
-    const defaultResult = {
-        live: false,
-        platform: "twitch",
-        title: "",
-        game: "",
-        viewers: 0,
-        thumbnail: "",
-        url: `https://www.twitch.tv/${TWITCH_USERNAME}`,
-    };
-
+    const defaultResult = getDefaultTwitchStatus();
     const token = await getTwitchToken();
 
     if (!token || !TWITCH_CLIENT_ID) {
@@ -86,7 +103,9 @@ async function getTwitchStatus() {
     );
 
     if (!response.ok) {
-        throw new Error(`Twitch streams request failed: ${response.status}`);
+        throw new Error(
+            `Twitch streams request failed: ${response.status}`
+        );
     }
 
     const data = await response.json();
@@ -99,13 +118,65 @@ async function getTwitchStatus() {
     return {
         live: true,
         platform: "twitch",
-        title: stream.title || "",
+        title: stream.title || "Moore Games is live on Twitch",
         game: stream.game_name || "",
         viewers: stream.viewer_count || 0,
         thumbnail: stream.thumbnail_url
             ?.replace("{width}", "640")
             .replace("{height}", "360"),
         url: `https://www.twitch.tv/${TWITCH_USERNAME}`,
+    };
+}
+
+async function getYouTubeLiveStatus() {
+    const defaultResult = getDefaultYouTubeLiveStatus();
+
+    if (!YOUTUBE_API_KEY) {
+        return defaultResult;
+    }
+
+    const parameters = new URLSearchParams({
+        part: "snippet",
+        channelId: YOUTUBE_CHANNEL_ID,
+        eventType: "live",
+        type: "video",
+        maxResults: "1",
+        key: YOUTUBE_API_KEY,
+    });
+
+    const response = await fetch(
+        `https://www.googleapis.com/youtube/v3/search?${parameters}`
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            `YouTube live request failed: ${response.status}`
+        );
+    }
+
+    const data = await response.json();
+    const item = data.items?.[0];
+    const videoId = item?.id?.videoId;
+
+    if (!videoId) {
+        return defaultResult;
+    }
+
+    const thumbnails = item.snippet?.thumbnails ?? {};
+
+    return {
+        live: true,
+        platform: "youtube",
+        title: item.snippet?.title || "Moore Games is live on YouTube",
+        videoId,
+        thumbnail:
+            thumbnails.maxres?.url ??
+            thumbnails.standard?.url ??
+            thumbnails.high?.url ??
+            thumbnails.medium?.url ??
+            thumbnails.default?.url ??
+            `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+        url: `https://www.youtube.com/watch?v=${videoId}`,
     };
 }
 
@@ -175,6 +246,7 @@ async function getLatestYouTubeVideo() {
 
     return {
         videoId,
+        platform: "youtube",
         title: item.snippet?.title || "Latest Moore Games video",
         publishedAt:
             item.contentDetails?.videoPublishedAt ??
@@ -193,41 +265,104 @@ async function getLatestYouTubeVideo() {
 
 app.get("/api/dashboard", async (request, response) => {
     try {
-        const [twitchResult, youtubeResult] = await Promise.allSettled([
+        const [
+            twitchResult,
+            youtubeLiveResult,
+            latestVideoResult,
+        ] = await Promise.allSettled([
             getTwitchStatus(),
+            getYouTubeLiveStatus(),
             getLatestYouTubeVideo(),
         ]);
 
-        const stream =
+        const twitch =
             twitchResult.status === "fulfilled"
                 ? twitchResult.value
-                : {
-                      live: false,
-                      platform: "twitch",
-                      title: "",
-                      game: "",
-                      viewers: 0,
-                      thumbnail: "",
-                      url: `https://www.twitch.tv/${TWITCH_USERNAME}`,
-                  };
+                : getDefaultTwitchStatus();
+
+        const youtubeLive =
+            youtubeLiveResult.status === "fulfilled"
+                ? youtubeLiveResult.value
+                : getDefaultYouTubeLiveStatus();
 
         const latestVideo =
-            youtubeResult.status === "fulfilled"
-                ? youtubeResult.value
+            latestVideoResult.status === "fulfilled"
+                ? latestVideoResult.value
                 : null;
+
+        let featuredContent = null;
+
+        if (twitch.live) {
+            featuredContent = {
+                type: "live",
+                platform: "twitch",
+                title: twitch.title,
+                subtitle: twitch.game
+                    ? `Playing ${twitch.game}`
+                    : "Watch the live stream",
+                thumbnail: twitch.thumbnail,
+                url: twitch.url,
+                viewers: twitch.viewers,
+            };
+        } else if (youtubeLive.live) {
+            featuredContent = {
+                type: "live",
+                platform: "youtube",
+                title: youtubeLive.title,
+                subtitle: "Watch the live stream",
+                thumbnail: youtubeLive.thumbnail,
+                url: youtubeLive.url,
+                viewers: null,
+            };
+        } else if (latestVideo) {
+            featuredContent = {
+                type: "video",
+                platform: "youtube",
+                title: latestVideo.title,
+                subtitle: "Latest Moore Games video",
+                thumbnail: latestVideo.thumbnail,
+                url: latestVideo.url,
+                publishedAt: latestVideo.publishedAt,
+                videoId: latestVideo.videoId,
+            };
+        } else {
+            featuredContent = {
+                type: "video",
+                platform: "youtube",
+                title: "Watch Moore Games on YouTube",
+                subtitle: "Gameplay, playthroughs, and more",
+                thumbnail: "/banner.jpeg",
+                url: YOUTUBE_CHANNEL_URL,
+            };
+        }
 
         if (twitchResult.status === "rejected") {
             console.error("Twitch error:", twitchResult.reason);
         }
 
-        if (youtubeResult.status === "rejected") {
-            console.error("YouTube error:", youtubeResult.reason);
+        if (youtubeLiveResult.status === "rejected") {
+            console.error(
+                "YouTube live error:",
+                youtubeLiveResult.reason
+            );
         }
 
-        response.set("Cache-Control", "public, max-age=60");
+        if (latestVideoResult.status === "rejected") {
+            console.error(
+                "Latest YouTube video error:",
+                latestVideoResult.reason
+            );
+        }
+
+        response.set(
+            "Cache-Control",
+            "public, max-age=30, stale-while-revalidate=30"
+        );
 
         response.json({
-            stream,
+            featuredContent,
+            twitch,
+            youtubeLive,
             latestVideo,
             updatedAt: new Date().toISOString(),
         });
@@ -241,5 +376,7 @@ app.get("/api/dashboard", async (request, response) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Moore Games API running at http://localhost:${PORT}`);
+    console.log(
+        `Moore Games API running at http://localhost:${PORT}`
+    );
 });
