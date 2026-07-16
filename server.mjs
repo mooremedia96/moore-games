@@ -41,7 +41,6 @@ function getDefaultYouTubeLiveStatus() {
 }
 
 async function getTwitchToken() {
-    console.log("Twitch token loaded successfully");
     const now = Date.now();
 
     if (twitchToken && now < twitchTokenExpiresAt) {
