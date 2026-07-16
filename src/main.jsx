@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import StreamStatus from "./StreamStatus";
+import FeaturedContent from "./FeaturedContent";
 import './styles.css';
 
 const links = [
@@ -50,12 +50,12 @@ function App() {
           <div className="roles">Gamer <span>•</span> Content Creator <span>•</span> Community</div>
           <p>Welcome to the channel! Game plays, live streams and good vibes. Let’s level up together.</p>
         </section>
-
+        
+        <FeaturedContent />
+        
         <section className="links-panel">
           {links.map((item) => <LinkCard key={item.name} item={item} />)}
         </section>
-
-        <StreamStatus />
 
         <nav className="social-row" aria-label="Social media links">
           {links.map((item) => (
