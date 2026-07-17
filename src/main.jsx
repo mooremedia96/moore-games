@@ -348,22 +348,50 @@ function App() {
       }
     }
 
-    appElement.addEventListener("touchstart", handleTouchStart, {
+    document.addEventListener("touchstart", handleTouchStart, {
       passive: true,
+      capture: true,
     });
-    appElement.addEventListener("touchmove", handleTouchMove, {
+
+    document.addEventListener("touchmove", handleTouchMove, {
       passive: false,
+      capture: true,
     });
-    appElement.addEventListener("touchend", handleTouchEnd);
-    appElement.addEventListener("touchcancel", handleTouchEnd);
+
+    document.addEventListener("touchend", handleTouchEnd, {
+      capture: true,
+    });
+
+    document.addEventListener("touchcancel", handleTouchEnd, {
+      capture: true,
+    });
 
     return () => {
-      appElement.removeEventListener("touchstart", handleTouchStart);
-      appElement.removeEventListener("touchmove", handleTouchMove);
-      appElement.removeEventListener("touchend", handleTouchEnd);
-      appElement.removeEventListener("touchcancel", handleTouchEnd);
+      document.removeEventListener(
+        "touchstart",
+        handleTouchStart,
+        true
+      );
+
+      document.removeEventListener(
+        "touchmove",
+        handleTouchMove,
+        true
+      );
+
+      document.removeEventListener(
+        "touchend",
+        handleTouchEnd,
+        true
+      );
+
+      document.removeEventListener(
+        "touchcancel",
+        handleTouchEnd,
+        true
+      );
     };
-  }, [pullState, refreshFromPull]);
+  }, [refreshFromPull]);
 
   return (
     <div
