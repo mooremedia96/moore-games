@@ -136,7 +136,6 @@ export async function getYouTubeLiveStatus() {
                 0
             ),
             thumbnail:
-                thumbnails.maxres?.url ??
                 thumbnails.standard?.url ??
                 thumbnails.high?.url ??
                 thumbnails.medium?.url ??
@@ -283,7 +282,6 @@ export async function getLatestYouTubeVideo() {
         publishedAt:
             latestRegularVideo.snippet?.publishedAt ?? "",
         thumbnail:
-            thumbnails.maxres?.url ??
             thumbnails.standard?.url ??
             thumbnails.high?.url ??
             thumbnails.medium?.url ??

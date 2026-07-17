@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cors from "cors";
 
 import { getDashboard } from "./routes/dashboard.mjs";
 
@@ -10,6 +11,28 @@ import {
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
+
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:4173",
+    "https://mooremedia96.github.io",
+];
+
+app.use(
+    cors({
+        origin(origin, callback) {
+            // Allow server-to-server requests and approved browser origins
+            if (!origin || allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+
+            console.warn(`Blocked CORS origin: ${origin}`);
+            return callback(new Error("Not allowed by CORS"));
+        },
+        methods: ["GET", "POST", "OPTIONS"],
+        credentials: false,
+    })
+);
 
 app.use(express.json());
 
@@ -100,6 +123,7 @@ app.get(
         }
     }
 );
+
 app.get("/api/dashboard", async (request, response) => {
     try {
         const dashboard = await getDashboard();
