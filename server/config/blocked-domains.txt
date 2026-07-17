@@ -1,0 +1,41 @@
+# Known disposable and temporary email providers.
+# Add one domain per line. Subdomains are blocked automatically.
+# Restart MooreGamesAPI after editing this file.
+
+10minutemail.com
+10minutemail.net
+20minutemail.com
+anonbox.net
+binkmail.com
+bobmail.info
+burner.kiwi
+byom.de
+dispostable.com
+emailondeck.com
+fakeinbox.com
+fakemail.net
+getairmail.com
+guerrillamail.com
+guerrillamail.net
+guerrillamail.org
+guerrillamailblock.com
+maildrop.cc
+mailinator.com
+mailinator.net
+mintemail.com
+mohmal.com
+mytemp.email
+nada.email
+sharklasers.com
+spam4.me
+temp-mail.org
+tempail.com
+tempmail.com
+tempmail.io
+tempmail.net
+throwawaymail.com
+trashmail.com
+trashmail.net
+yopmail.com
+yopmail.fr
+yopmail.net

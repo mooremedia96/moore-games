@@ -1,0 +1,8 @@
+# Add one trusted domain per line only when a legitimate domain is
+# accidentally matched by blocked-domains.txt.
+#
+# An allowlisted domain overrides the domain blocklist, but it does not
+# override an exact address in blocked-emails.txt.
+#
+# Example:
+# trusted-company.example

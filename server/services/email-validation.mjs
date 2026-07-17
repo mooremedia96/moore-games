@@ -4,23 +4,11 @@ import {
     resolveMx,
 } from "node:dns/promises";
 import { domainToASCII } from "node:url";
+import { checkSenderBlocklist } from "./sender-blocklist.mjs";
 
 const CACHE_DURATION = 6 * 60 * 60 * 1000;
 const DNS_TIMEOUT = 3000;
 const emailDomainCache = new Map();
-
-const DISPOSABLE_EMAIL_DOMAINS = new Set([
-    "10minutemail.com",
-    "guerrillamail.com",
-    "guerrillamailblock.com",
-    "maildrop.cc",
-    "mailinator.com",
-    "sharklasers.com",
-    "temp-mail.org",
-    "tempmail.com",
-    "throwawaymail.com",
-    "yopmail.com",
-]);
 
 function getCachedResult(domain) {
     const cached = emailDomainCache.get(domain);
@@ -75,6 +63,17 @@ async function hasAddressRecord(domain) {
 }
 
 export async function validateEmailDomain(email = "") {
+    const senderCheck =
+        checkSenderBlocklist(email);
+
+    if (!senderCheck.allowed) {
+        return {
+            valid: false,
+            message:
+                "This email address cannot be used.",
+        };
+    }
+
     const separatorIndex = email.lastIndexOf("@");
     const rawDomain =
         separatorIndex >= 0
@@ -88,22 +87,6 @@ export async function validateEmailDomain(email = "") {
         return {
             valid: false,
             message: "Enter a valid email address.",
-        };
-    }
-
-    const isDisposable = [
-        ...DISPOSABLE_EMAIL_DOMAINS,
-    ].some(
-        (blockedDomain) =>
-            domain === blockedDomain ||
-            domain.endsWith(`.${blockedDomain}`)
-    );
-
-    if (isDisposable) {
-        return {
-            valid: false,
-            message:
-                "Please use a permanent email address.",
         };
     }
 

@@ -4,6 +4,7 @@ import {
     validateHumanName,
 } from "../services/moderation.mjs";
 import { validateEmailDomain } from "../services/email-validation.mjs";
+import { verifyTurnstile } from "../services/turnstile.mjs";
 
 const EMAIL_PATTERN =
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -125,6 +126,28 @@ export async function submitContact(
             error:
                 "Please correct the highlighted fields.",
             fields: errors,
+        });
+    }
+
+    const turnstileResult =
+        await verifyTurnstile(
+            request.body?.turnstileToken,
+            request
+        );
+
+    if (!turnstileResult.success) {
+        if (turnstileResult.unavailable) {
+            return response.status(503).json({
+                error:
+                    "Security verification is temporarily unavailable. Please try again shortly.",
+                turnstile: true,
+            });
+        }
+
+        return response.status(400).json({
+            error:
+                "Please complete the security verification and try again.",
+            turnstile: true,
         });
     }
 

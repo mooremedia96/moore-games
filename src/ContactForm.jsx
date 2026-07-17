@@ -15,6 +15,69 @@ const EMPTY_FORM = {
 
 const EMAIL_PATTERN =
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const TURNSTILE_SCRIPT_URL =
+  "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+
+let turnstileScriptPromise = null;
+
+function loadTurnstile() {
+  if (window.turnstile) {
+    return Promise.resolve(window.turnstile);
+  }
+
+  if (turnstileScriptPromise) {
+    return turnstileScriptPromise;
+  }
+
+  turnstileScriptPromise = new Promise(
+    (resolve, reject) => {
+      const existingScript = document.querySelector(
+        `script[src="${TURNSTILE_SCRIPT_URL}"]`
+      );
+      const script =
+        existingScript ||
+        document.createElement("script");
+
+      function handleLoad() {
+        if (window.turnstile) {
+          resolve(window.turnstile);
+          return;
+        }
+
+        reject(
+          new Error(
+            "Cloudflare security verification did not initialize."
+          )
+        );
+      }
+
+      function handleError() {
+        turnstileScriptPromise = null;
+        reject(
+          new Error(
+            "Cloudflare security verification could not load."
+          )
+        );
+      }
+
+      script.addEventListener("load", handleLoad, {
+        once: true,
+      });
+      script.addEventListener("error", handleError, {
+        once: true,
+      });
+
+      if (!existingScript) {
+        script.src = TURNSTILE_SCRIPT_URL;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    }
+  );
+
+  return turnstileScriptPromise;
+}
 
 function validateBeforeSubmit(form) {
   const errors = {};
@@ -47,10 +110,16 @@ function ContactForm({ open, onClose }) {
   const [fieldErrors, setFieldErrors] = useState({});
   const [status, setStatus] = useState("idle");
   const [statusMessage, setStatusMessage] = useState("");
+  const [turnstileToken, setTurnstileToken] =
+    useState("");
+  const [turnstileError, setTurnstileError] =
+    useState("");
 
   const dialogRef = useRef(null);
   const closeButtonRef = useRef(null);
   const previousFocusRef = useRef(null);
+  const turnstileContainerRef = useRef(null);
+  const turnstileWidgetRef = useRef(null);
 
   useEffect(() => {
     if (!open) {
@@ -110,6 +179,100 @@ function ContactForm({ open, onClose }) {
     };
   }, [open, onClose]);
 
+  useEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+
+    let cancelled = false;
+    const siteKey =
+      import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim();
+
+    setTurnstileToken("");
+    setTurnstileError("");
+
+    if (!siteKey) {
+      setTurnstileError(
+        "Security verification is not configured."
+      );
+      return undefined;
+    }
+
+    loadTurnstile()
+      .then((turnstile) => {
+        if (
+          cancelled ||
+          !turnstileContainerRef.current
+        ) {
+          return;
+        }
+
+        turnstileWidgetRef.current =
+          turnstile.render(
+            turnstileContainerRef.current,
+            {
+              sitekey: siteKey,
+              action: "contact_form",
+              theme: "dark",
+              appearance: "interaction-only",
+              size: window.matchMedia(
+                "(max-width: 380px)"
+              ).matches
+                ? "compact"
+                : "flexible",
+              callback(token) {
+                if (cancelled) {
+                  return;
+                }
+
+                setTurnstileToken(token);
+                setTurnstileError("");
+              },
+              "expired-callback"() {
+                if (cancelled) {
+                  return;
+                }
+
+                setTurnstileToken("");
+                setTurnstileError(
+                  "The security check expired. Please complete it again."
+                );
+              },
+              "error-callback"() {
+                if (cancelled) {
+                  return;
+                }
+
+                setTurnstileToken("");
+                setTurnstileError(
+                  "Security verification failed to load. Please try again."
+                );
+              },
+            }
+          );
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          setTurnstileError(error.message);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+
+      if (
+        turnstileWidgetRef.current !== null &&
+        window.turnstile
+      ) {
+        window.turnstile.remove(
+          turnstileWidgetRef.current
+        );
+      }
+
+      turnstileWidgetRef.current = null;
+    };
+  }, [open]);
+
   if (!open) {
     return null;
   }
@@ -140,7 +303,22 @@ function ContactForm({ open, onClose }) {
       setStatus("idle");
       setStatusMessage("");
       setFieldErrors({});
+      setTurnstileToken("");
+      setTurnstileError("");
     }, 200);
+  }
+
+  function resetTurnstile() {
+    setTurnstileToken("");
+
+    if (
+      turnstileWidgetRef.current !== null &&
+      window.turnstile
+    ) {
+      window.turnstile.reset(
+        turnstileWidgetRef.current
+      );
+    }
   }
 
   async function submitForm(event) {
@@ -161,6 +339,13 @@ function ContactForm({ open, onClose }) {
       return;
     }
 
+    if (!turnstileToken) {
+      setTurnstileError(
+        "Please complete the security verification."
+      );
+      return;
+    }
+
     setStatus("sending");
     setStatusMessage("");
     setFieldErrors({});
@@ -175,7 +360,10 @@ function ContactForm({ open, onClose }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          turnstileToken,
+        }),
       });
 
       const result = await response.json().catch(() => ({}));
@@ -198,6 +386,7 @@ function ContactForm({ open, onClose }) {
       );
       setForm(EMPTY_FORM);
     } catch (error) {
+      resetTurnstile();
       setStatus("error");
       setStatusMessage(
         error.message ||
@@ -371,6 +560,22 @@ function ContactForm({ open, onClose }) {
                 autoComplete="off"
               />
             </label>
+
+            <div className="contact-turnstile-wrap">
+              <div
+                ref={turnstileContainerRef}
+                className="contact-turnstile"
+                aria-label="Security verification"
+              />
+              {turnstileError && (
+                <small
+                  className="contact-turnstile-error"
+                  role="alert"
+                >
+                  {turnstileError}
+                </small>
+              )}
+            </div>
 
             {status === "error" && (
               <p
