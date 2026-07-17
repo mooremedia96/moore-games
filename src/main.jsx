@@ -13,7 +13,7 @@ const FALLBACK_CONTENT = {
   platform: "youtube",
   title: "Watch Moore Games on YouTube",
   subtitle: "Gameplay, playthroughs, and more",
-  thumbnail: `${import.meta.env.BASE_URL}banner.webp`,
+  thumbnail: `${import.meta.env.BASE_URL}banner-800.webp`,
   url: "https://www.youtube.com/@mooregames96",
   publishedAt: "",
   startedAt: "",
@@ -273,7 +273,7 @@ function App() {
       if (
         event.touches.length !== 1 ||
         !pageIsAtTop() ||
-        pullState === "refreshing" ||
+        requestRef.current ||
         !window.matchMedia("(max-width: 700px)").matches
       ) {
         return;
@@ -314,7 +314,9 @@ function App() {
         return;
       }
 
-      event.preventDefault();
+      if (event.cancelable) {
+  event.preventDefault();
+}
 
       const resistedDistance = Math.min(
         MAX_PULL_DISTANCE,
@@ -406,7 +408,19 @@ function App() {
       ) : (
         <main className="site-card site-card-loaded">
           <header className="hero">
-            <img src={`${import.meta.env.BASE_URL}banner.webp`} alt="Moore Games space banner" />
+            <img
+              src={`${import.meta.env.BASE_URL}banner-800.webp`}
+              srcSet={[
+                `${import.meta.env.BASE_URL}banner-800.webp 800w`,
+                `${import.meta.env.BASE_URL}banner-1600.webp 1600w`,
+              ].join(", ")}
+              sizes="(max-width: 700px) 100vw, 760px"
+              width="1600"
+              height="696"
+              fetchPriority="high"
+              decoding="async"
+              alt="Moore Games space banner"
+            />
             <div className="hero-shade" />
           </header>
 
