@@ -151,71 +151,75 @@ function FeaturedContent() {
     const contentSignatureRef = useRef("");
     const transitionTimerRef = useRef(null);
 
-    useEffect(() => {
-        const controller = new AbortController();
-        let isMounted = true;
+useEffect(() => {
+    const controller = new AbortController();
+    let isMounted = true;
 
-        async function loadFeaturedContent() {
-            try {
-                const response = await fetch("/api/dashboard", {
-                    cache: "no-store",
-                    signal: controller.signal,
-                });
+    async function loadFeaturedContent() {
+        try {
+            const apiUrl = import.meta.env.PROD
+                ? import.meta.env.VITE_API_URL?.replace(/\/$/, "")
+                : "";
 
-                if (!response.ok) {
-                    throw new Error(
-                        `Dashboard request failed with status ${response.status}`
-                    );
-                }
+            const response = await fetch(`${apiUrl}/api/dashboard`, {
+                cache: "no-store",
+                signal: controller.signal,
+            });
 
-                const data = await response.json();
-                const nextContent = data.featuredContent;
-
-                if (!isMounted || !nextContent) {
-                    return;
-                }
-
-                const nextSignature = createContentSignature(nextContent);
-
-                if (nextSignature !== contentSignatureRef.current) {
-                    contentSignatureRef.current = nextSignature;
-                    setContent(nextContent);
-                }
-
-                setError("");
-            } catch (requestError) {
-                if (requestError.name === "AbortError") {
-                    return;
-                }
-
-                console.error(
-                    "Unable to load featured content:",
-                    requestError
+            if (!response.ok) {
+                throw new Error(
+                    `Dashboard request failed with status ${response.status}`
                 );
+            }
 
-                if (isMounted) {
-                    setError("Unable to refresh featured content.");
-                }
-            } finally {
-                if (isMounted) {
-                    setLoading(false);
-                }
+            const data = await response.json();
+            const nextContent = data.featuredContent;
+
+            if (!isMounted || !nextContent) {
+                return;
+            }
+
+            const nextSignature = createContentSignature(nextContent);
+
+            if (nextSignature !== contentSignatureRef.current) {
+                contentSignatureRef.current = nextSignature;
+                setContent(nextContent);
+            }
+
+            setError("");
+        } catch (requestError) {
+            if (requestError.name === "AbortError") {
+                return;
+            }
+
+            console.error(
+                "Unable to load featured content:",
+                requestError
+            );
+
+            if (isMounted) {
+                setError("Unable to refresh featured content.");
+            }
+        } finally {
+            if (isMounted) {
+                setLoading(false);
             }
         }
+    }
 
-        loadFeaturedContent();
+    loadFeaturedContent();
 
-        const intervalId = window.setInterval(
-            loadFeaturedContent,
-            REFRESH_INTERVAL
-        );
+    const intervalId = window.setInterval(
+        loadFeaturedContent,
+        REFRESH_INTERVAL
+    );
 
-        return () => {
-            isMounted = false;
-            controller.abort();
-            window.clearInterval(intervalId);
-        };
-    }, []);
+    return () => {
+        isMounted = false;
+        controller.abort();
+        window.clearInterval(intervalId);
+    };
+}, []);
 
     if (loading) {
         return (
