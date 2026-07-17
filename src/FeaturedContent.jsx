@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 
 const REFRESH_INTERVAL = 60_000;
+const FALLBACK_IMAGE = `${import.meta.env.BASE_URL}banner.jpeg`;
 
 const FALLBACK_CONTENT = {
     type: "video",
     platform: "youtube",
     title: "Watch Moore Games on YouTube",
     subtitle: "Gameplay, playthroughs, and more",
-    thumbnail: "/banner.jpeg",
+    thumbnail: `${import.meta.env.BASE_URL}banner.jpeg`,
     url: "https://www.youtube.com/@mooregames96",
     publishedAt: "",
     startedAt: "",
@@ -151,75 +152,75 @@ function FeaturedContent() {
     const contentSignatureRef = useRef("");
     const transitionTimerRef = useRef(null);
 
-useEffect(() => {
-    const controller = new AbortController();
-    let isMounted = true;
+    useEffect(() => {
+        const controller = new AbortController();
+        let isMounted = true;
 
-    async function loadFeaturedContent() {
-        try {
-            const apiUrl = import.meta.env.PROD
-                ? import.meta.env.VITE_API_URL?.replace(/\/$/, "")
-                : "";
+        async function loadFeaturedContent() {
+            try {
+                const apiUrl = import.meta.env.PROD
+                    ? import.meta.env.VITE_API_URL?.replace(/\/$/, "")
+                    : "";
 
-            const response = await fetch(`${apiUrl}/api/dashboard`, {
-                cache: "no-store",
-                signal: controller.signal,
-            });
+                const response = await fetch(`${apiUrl}/api/dashboard`, {
+                    cache: "no-store",
+                    signal: controller.signal,
+                });
 
-            if (!response.ok) {
-                throw new Error(
-                    `Dashboard request failed with status ${response.status}`
+                if (!response.ok) {
+                    throw new Error(
+                        `Dashboard request failed with status ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+                const nextContent = data.featuredContent;
+
+                if (!isMounted || !nextContent) {
+                    return;
+                }
+
+                const nextSignature = createContentSignature(nextContent);
+
+                if (nextSignature !== contentSignatureRef.current) {
+                    contentSignatureRef.current = nextSignature;
+                    setContent(nextContent);
+                }
+
+                setError("");
+            } catch (requestError) {
+                if (requestError.name === "AbortError") {
+                    return;
+                }
+
+                console.error(
+                    "Unable to load featured content:",
+                    requestError
                 );
-            }
 
-            const data = await response.json();
-            const nextContent = data.featuredContent;
-
-            if (!isMounted || !nextContent) {
-                return;
-            }
-
-            const nextSignature = createContentSignature(nextContent);
-
-            if (nextSignature !== contentSignatureRef.current) {
-                contentSignatureRef.current = nextSignature;
-                setContent(nextContent);
-            }
-
-            setError("");
-        } catch (requestError) {
-            if (requestError.name === "AbortError") {
-                return;
-            }
-
-            console.error(
-                "Unable to load featured content:",
-                requestError
-            );
-
-            if (isMounted) {
-                setError("Unable to refresh featured content.");
-            }
-        } finally {
-            if (isMounted) {
-                setLoading(false);
+                if (isMounted) {
+                    setError("Unable to refresh featured content.");
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         }
-    }
 
-    loadFeaturedContent();
+        loadFeaturedContent();
 
-    const intervalId = window.setInterval(
-        loadFeaturedContent,
-        REFRESH_INTERVAL
-    );
+        const intervalId = window.setInterval(
+            loadFeaturedContent,
+            REFRESH_INTERVAL
+        );
 
-    return () => {
-        isMounted = false;
-        controller.abort();
-        window.clearInterval(intervalId);
-    };
-}, []);
+        return () => {
+            isMounted = false;
+            controller.abort();
+            window.clearInterval(intervalId);
+        };
+    }, []);
 
     if (loading) {
         return (
@@ -318,13 +319,13 @@ useEffect(() => {
             >
                 <div className="featured-thumbnail">
                     <img
-                        src={content.thumbnail || "/banner.jpeg"}
-                        alt={
-                            content.title ||
-                            "Moore Games featured content"
-                        }
+                        src={content.thumbnail || FALLBACK_CONTENT.thumbnail}
+                        alt={content.title}
                         onError={(event) => {
-                            event.currentTarget.src = "/banner.jpeg";
+                            const image = event.currentTarget;
+
+                            image.onerror = null;
+                            image.src = `${import.meta.env.BASE_URL}banner.jpeg`;
                         }}
                     />
 
