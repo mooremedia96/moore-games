@@ -1,6 +1,11 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
+import {
+    ipKeyGenerator,
+    rateLimit,
+} from "express-rate-limit";
 
 import { getDashboard } from "./routes/dashboard.mjs";
 
@@ -11,12 +16,74 @@ import {
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
+const API_HOST =
+    process.env.API_HOST || "127.0.0.1";
 
 const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:4173",
     "https://mooremedia96.github.io",
 ];
+
+const localHostnames = new Set([
+    "localhost",
+    "127.0.0.1",
+    "::1",
+    "[::1]",
+]);
+
+function rateLimitKey(request) {
+    const cloudflareIp =
+        request.get("cf-connecting-ip");
+
+    return ipKeyGenerator(
+        cloudflareIp || request.ip
+    );
+}
+
+function requireLocalRequest(
+    request,
+    response,
+    next
+) {
+    const hostname =
+        request.hostname?.toLowerCase() || "";
+
+    if (!localHostnames.has(hostname)) {
+        return response.status(404).json({
+            error: "Route not found.",
+        });
+    }
+
+    return next();
+}
+
+const apiRateLimiter = rateLimit({
+    windowMs: 60_000,
+    limit: 120,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    keyGenerator: rateLimitKey,
+    message: {
+        error:
+            "Too many requests. Please try again shortly.",
+    },
+});
+
+const authorizationRateLimiter = rateLimit({
+    windowMs: 15 * 60_000,
+    limit: 10,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    keyGenerator: rateLimitKey,
+    message: {
+        error:
+            "Too many authorization attempts. Please try again later.",
+    },
+});
+
+app.disable("x-powered-by");
+app.use(helmet());
 
 app.use(
     cors({
@@ -29,12 +96,18 @@ app.use(
             console.warn(`Blocked CORS origin: ${origin}`);
             return callback(new Error("Not allowed by CORS"));
         },
-        methods: ["GET", "POST", "OPTIONS"],
+        methods: ["GET", "OPTIONS"],
         credentials: false,
+        maxAge: 86_400,
     })
 );
 
-app.use(express.json());
+app.use("/api", apiRateLimiter);
+app.use(
+    "/auth",
+    requireLocalRequest,
+    authorizationRateLimiter
+);
 
 app.get("/api/health", (request, response) => {
     response.json({
@@ -56,7 +129,11 @@ app.get("/auth/youtube", (request, response) => {
             error
         );
 
-        response.status(500).send(error.message);
+        response
+            .status(500)
+            .send(
+                "YouTube authorization is not available."
+            );
     }
 });
 
@@ -68,7 +145,7 @@ app.get(
                 return response
                     .status(400)
                     .send(
-                        `Google authorization failed: ${request.query.error}`
+                        "Google authorization was cancelled or denied."
                     );
             }
 
@@ -107,8 +184,8 @@ app.get(
                     text-align: center;
                 ">
                     <h1>YouTube authorization successful</h1>
-                    <p>Return to the terminal and copy the refresh token into your .env file.</p>
-                    <p>You may close this browser tab afterward.</p>
+                    <p>Authorization is complete.</p>
+                    <p>You may close this browser tab.</p>
                 </main>
             `);
         } catch (error) {
@@ -152,8 +229,22 @@ app.use((request, response) => {
     });
 });
 
-app.listen(PORT, () => {
+app.use((error, request, response, next) => {
+    if (error?.message === "Not allowed by CORS") {
+        return response.status(403).json({
+            error: "Origin not allowed.",
+        });
+    }
+
+    console.error("Unhandled API error:", error);
+
+    return response.status(500).json({
+        error: "Internal server error.",
+    });
+});
+
+app.listen(PORT, API_HOST, () => {
     console.log(
-        `Moore Games API running at http://localhost:${PORT}`
+        `Moore Games API running at http://${API_HOST}:${PORT}`
     );
 });
