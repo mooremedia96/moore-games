@@ -412,7 +412,7 @@ function App() {
 
           <section className="profile">
             <div className="avatar-wrap">
-              <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Moore Games logo" />
+              <img src={`${import.meta.env.BASE_URL}logo.webp`} alt="Moore Games logo" />
               <span className="online-dot" />
             </div>
             <h1>Moore Games</h1>
