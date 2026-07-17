@@ -1,4 +1,9 @@
 import { sendContactEmail } from "../services/email.mjs";
+import {
+    moderateContact,
+    validateHumanName,
+} from "../services/moderation.mjs";
+import { validateEmailDomain } from "../services/email-validation.mjs";
 
 const EMAIL_PATTERN =
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -48,11 +53,20 @@ function validateContact(body = {}) {
     ) {
         errors.name =
             "Enter a name between 2 and 80 characters.";
+    } else {
+        const nameResult = validateHumanName(
+            contact.name
+        );
+
+        if (!nameResult.valid) {
+            errors.name = nameResult.message;
+        }
     }
 
     if (
         contact.email.length > 254 ||
-        !EMAIL_PATTERN.test(contact.email)
+        !EMAIL_PATTERN.test(contact.email) ||
+        contact.email.includes("..")
     ) {
         errors.email =
             "Enter a valid email address.";
@@ -111,6 +125,37 @@ export async function submitContact(
             error:
                 "Please correct the highlighted fields.",
             fields: errors,
+        });
+    }
+
+    const moderation = moderateContact(contact);
+
+    if (!moderation.accepted) {
+        console.warn(
+            "Contact submission rejected:",
+            moderation.reason
+        );
+
+        return response.status(400).json({
+            error:
+                "Please correct the highlighted fields.",
+            fields: {
+                [moderation.field]:
+                    moderation.message,
+            },
+        });
+    }
+
+    const emailDomainResult =
+        await validateEmailDomain(contact.email);
+
+    if (!emailDomainResult.valid) {
+        return response.status(400).json({
+            error:
+                "Please correct the highlighted fields.",
+            fields: {
+                email: emailDomainResult.message,
+            },
         });
     }
 

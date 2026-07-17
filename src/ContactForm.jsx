@@ -13,6 +13,35 @@ const EMPTY_FORM = {
   website: "",
 };
 
+const EMAIL_PATTERN =
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateBeforeSubmit(form) {
+  const errors = {};
+  const name = form.name.trim();
+  const email = form.email.trim();
+  const message = form.message.trim();
+
+  if (name.length < 2) {
+    errors.name = "Enter your name.";
+  }
+
+  if (
+    email.length > 254 ||
+    !EMAIL_PATTERN.test(email) ||
+    email.includes("..")
+  ) {
+    errors.email = "Enter a valid email address.";
+  }
+
+  if (message.length < 20) {
+    errors.message =
+      "Enter a message of at least 20 characters.";
+  }
+
+  return errors;
+}
+
 function ContactForm({ open, onClose }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [fieldErrors, setFieldErrors] = useState({});
@@ -118,6 +147,17 @@ function ContactForm({ open, onClose }) {
     event.preventDefault();
 
     if (status === "sending") {
+      return;
+    }
+
+    const localErrors = validateBeforeSubmit(form);
+
+    if (Object.keys(localErrors).length > 0) {
+      setFieldErrors(localErrors);
+      setStatus("error");
+      setStatusMessage(
+        "Please add your name, a valid email, and a complete message."
+      );
       return;
     }
 
@@ -353,6 +393,7 @@ function ContactForm({ open, onClose }) {
 
             <p className="contact-privacy">
               Your information is used only to respond to this inquiry.
+              Spam, abusive language, and profanity are not accepted.
             </p>
           </form>
         )}
