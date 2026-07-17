@@ -528,6 +528,9 @@ function ContactForm({ open, onClose }) {
 
             <label className="contact-field">
               <span>Message</span>
+              <span className="contact-message-hint">
+                Helpful details: goals • deliverables • timeline • budget • links
+              </span>
               <textarea
                 name="message"
                 value={form.message}
