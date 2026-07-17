@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#02050b" />
+  <meta name="robots" content="noindex, follow" />
+  <title>Signal Lost | Moore Games</title>
+
+  <link rel="icon" href="/moore-games/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/moore-games/apple-touch-icon.png" />
+
+  <style>
+    :root {
+      color: #fff;
+      background: #000;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-width: 320px;
+      min-height: 100%;
+      margin: 0;
+      background: #000;
+    }
+
+    body {
+      display: grid;
+      min-height: 100vh;
+      min-height: 100svh;
+      place-items: center;
+      overflow-x: hidden;
+      padding:
+        max(24px, env(safe-area-inset-top))
+        20px
+        max(24px, env(safe-area-inset-bottom));
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -4%;
+      z-index: 0;
+      background:
+        linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.2),
+          rgba(0, 0, 0, 0.76)
+        ),
+        url("/moore-games/space-bg.webp") center / cover no-repeat;
+      filter: blur(4px) brightness(0.72);
+      transform: scale(1.04);
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 520px);
+      padding: 32px 28px;
+      text-align: center;
+      border: 1px solid rgba(22, 135, 255, 0.7);
+      border-radius: 20px;
+      background: rgba(0, 4, 14, 0.86);
+      box-shadow:
+        0 0 36px rgba(0, 105, 255, 0.28),
+        inset 0 0 26px rgba(0, 76, 180, 0.06);
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      display: block;
+      width: 128px;
+      height: 128px;
+      margin: 0 auto 18px;
+      object-fit: cover;
+      border: 3px solid #1687ff;
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 4px #020711,
+        0 0 26px rgba(0, 118, 255, 0.85);
+    }
+
+    .code {
+      display: block;
+      margin-bottom: 6px;
+      color: #1687ff;
+      font-size: clamp(52px, 15vw, 82px);
+      font-weight: 900;
+      letter-spacing: 5px;
+      line-height: 1;
+      text-shadow: 0 0 24px rgba(22, 135, 255, 0.58);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 7vw, 34px);
+    }
+
+    p {
+      max-width: 390px;
+      margin: 12px auto 24px;
+      color: #cbd4df;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    a {
+      display: inline-flex;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 19px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      border: 1px solid #1687ff;
+      border-radius: 11px;
+      background:
+        linear-gradient(
+          100deg,
+          rgba(4, 18, 42, 0.98),
+          rgba(0, 7, 22, 0.96)
+        );
+      box-shadow: 0 0 18px rgba(0, 96, 255, 0.28);
+      transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    a:hover,
+    a:focus-visible {
+      transform: translateY(-2px);
+      border-color: #65c1ff;
+      box-shadow: 0 0 26px rgba(0, 115, 255, 0.5);
+    }
+
+    a:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 4px;
+    }
+
+    @media (max-width: 430px) {
+      main {
+        padding: 27px 18px;
+      }
+
+      .logo {
+        width: 106px;
+        height: 106px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      a {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <img
+      class="logo"
+      src="/moore-games/logo.webp"
+      width="128"
+      height="128"
+      alt="Moore Games logo"
+    />
+
+    <span class="code">404</span>
+    <h1>Signal Lost</h1>
+
+    <p>
+      This sector of the galaxy doesn’t exist—or the link may have moved.
+      Return to the Moore Games command center to continue.
+    </p>
+
+    <a href="/moore-games/">Return to Moore Games</a>
+  </main>
+</body>
+
+</html>
