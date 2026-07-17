@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const REFRESH_INTERVAL = 60_000;
+const REFRESH_INTERVAL = 15_000;
 
 const FALLBACK_CONTENT = {
     type: "video",
@@ -9,6 +9,10 @@ const FALLBACK_CONTENT = {
     subtitle: "Gameplay, playthroughs, and more",
     thumbnail: "/banner.jpeg",
     url: "https://www.youtube.com/@mooregames96",
+    publishedAt: "",
+    startedAt: "",
+    viewers: 0,
+    game: "",
 };
 
 function parseVideoTitle(title = "") {
@@ -27,12 +31,14 @@ function parseVideoTitle(title = "") {
 
     const partStart = partMatch.index ?? normalizedTitle.length;
 
+    const series =
+        normalizedTitle
+            .slice(0, partStart)
+            .replace(/[|–—-]\s*$/, "")
+            .trim() || normalizedTitle;
+
     return {
-        series:
-            normalizedTitle
-                .slice(0, partStart)
-                .replace(/[|–—-]\s*$/, "")
-                .trim() || normalizedTitle,
+        series,
         part: `Part ${partMatch[1]}`,
     };
 }
@@ -42,19 +48,22 @@ function formatPublishedDate(value) {
         return "";
     }
 
-    const date = new Date(value);
+    const publishedDate = new Date(value);
 
-    if (Number.isNaN(date.getTime())) {
+    if (Number.isNaN(publishedDate.getTime())) {
         return "";
     }
 
-    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    const elapsedSeconds = Math.max(
+        0,
+        Math.floor((Date.now() - publishedDate.getTime()) / 1000)
+    );
 
-    if (seconds < 60) {
+    if (elapsedSeconds < 60) {
         return "Uploaded moments ago";
     }
 
-    const minutes = Math.floor(seconds / 60);
+    const minutes = Math.floor(elapsedSeconds / 60);
 
     if (minutes < 60) {
         return `Uploaded ${minutes} minute${minutes === 1 ? "" : "s"} ago`;
@@ -76,7 +85,7 @@ function formatPublishedDate(value) {
         month: "short",
         day: "numeric",
         year: "numeric",
-    }).format(date)}`;
+    }).format(publishedDate)}`;
 }
 
 function formatUptime(value) {
@@ -105,6 +114,22 @@ function formatUptime(value) {
     return `Live for ${minutes}m`;
 }
 
+function createContentSignature(content) {
+    return JSON.stringify({
+        type: content?.type || "",
+        platform: content?.platform || "",
+        title: content?.title || "",
+        subtitle: content?.subtitle || "",
+        thumbnail: content?.thumbnail || "",
+        url: content?.url || "",
+        game: content?.game || "",
+        viewers: content?.viewers || 0,
+        startedAt: content?.startedAt || "",
+        publishedAt: content?.publishedAt || "",
+        videoId: content?.videoId || "",
+    });
+}
+
 function EyeIcon() {
     return (
         <svg
@@ -120,32 +145,57 @@ function EyeIcon() {
 function FeaturedContent() {
     const [content, setContent] = useState(FALLBACK_CONTENT);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [cardVisible, setCardVisible] = useState(true);
+
+    const contentSignatureRef = useRef("");
+    const transitionTimerRef = useRef(null);
 
     useEffect(() => {
+        const controller = new AbortController();
         let isMounted = true;
 
         async function loadFeaturedContent() {
             try {
                 const response = await fetch("/api/dashboard", {
                     cache: "no-store",
+                    signal: controller.signal,
                 });
 
                 if (!response.ok) {
                     throw new Error(
-                        `Dashboard request failed: ${response.status}`
+                        `Dashboard request failed with status ${response.status}`
                     );
                 }
 
                 const data = await response.json();
+                const nextContent = data.featuredContent;
 
-                if (isMounted && data.featuredContent) {
-                    setContent(data.featuredContent);
+                if (!isMounted || !nextContent) {
+                    return;
                 }
-            } catch (error) {
+
+                const nextSignature = createContentSignature(nextContent);
+
+                if (nextSignature !== contentSignatureRef.current) {
+                    contentSignatureRef.current = nextSignature;
+                    setContent(nextContent);
+                }
+
+                setError("");
+            } catch (requestError) {
+                if (requestError.name === "AbortError") {
+                    return;
+                }
+
                 console.error(
                     "Unable to load featured content:",
-                    error
+                    requestError
                 );
+
+                if (isMounted) {
+                    setError("Unable to refresh featured content.");
+                }
             } finally {
                 if (isMounted) {
                     setLoading(false);
@@ -162,18 +212,36 @@ function FeaturedContent() {
 
         return () => {
             isMounted = false;
+            controller.abort();
             window.clearInterval(intervalId);
         };
     }, []);
 
+    if (loading) {
+        return (
+            <section className="featured-content">
+                <div className="featured-heading">
+                    <span>FEATURED CONTENT</span>
+                </div>
+
+                <div className="featured-card featured-skeleton">
+                    <div className="featured-skeleton-thumbnail" />
+
+                    <div className="featured-skeleton-copy">
+                        <span className="skeleton-line skeleton-small" />
+                        <span className="skeleton-line skeleton-large" />
+                        <span className="skeleton-line skeleton-medium" />
+                        <span className="skeleton-line skeleton-button" />
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
     const isLive = content.type === "live";
     const isTwitch = content.platform === "twitch";
-    const isYouTube = content.platform === "youtube";
 
-    const parsedVideo = useMemo(
-        () => parseVideoTitle(content.title),
-        [content.title]
-    );
+    const parsedVideo = parseVideoTitle(content.title);
 
     const heading = isLive
         ? isTwitch
@@ -182,7 +250,8 @@ function FeaturedContent() {
         : "LATEST VIDEO";
 
     const categoryLabel = isLive
-        ? content.game || (isTwitch ? "TWITCH STREAM" : "YOUTUBE LIVE")
+        ? content.game ||
+        (isTwitch ? "TWITCH STREAM" : "YOUTUBE LIVE")
         : "CURRENT PLAYTHROUGH";
 
     const primaryTitle =
@@ -209,14 +278,19 @@ function FeaturedContent() {
             : "Join Live on YouTube"
         : "Watch on YouTube";
 
+    const cardKey = [
+        content.type,
+        content.platform,
+        content.url,
+    ].join("-");
+
     return (
         <section
             className={[
                 "featured-content",
                 isLive ? "featured-live" : "featured-video",
-                isTwitch
-                    ? "featured-twitch"
-                    : "featured-youtube",
+                isTwitch ? "featured-twitch" : "featured-youtube",
+                cardVisible ? "featured-visible" : "featured-hidden",
             ].join(" ")}
         >
             <div className="featured-heading">
@@ -231,6 +305,7 @@ function FeaturedContent() {
             </div>
 
             <a
+                key={cardKey}
                 className="featured-card"
                 href={content.url}
                 target="_blank"
@@ -240,7 +315,10 @@ function FeaturedContent() {
                 <div className="featured-thumbnail">
                     <img
                         src={content.thumbnail || "/banner.jpeg"}
-                        alt={content.title || "Moore Games featured content"}
+                        alt={
+                            content.title ||
+                            "Moore Games featured content"
+                        }
                         onError={(event) => {
                             event.currentTarget.src = "/banner.jpeg";
                         }}
@@ -275,7 +353,7 @@ function FeaturedContent() {
                             {categoryLabel}
                         </span>
 
-                        <strong>{loading ? "Loading..." : primaryTitle}</strong>
+                        <strong>{primaryTitle}</strong>
 
                         {secondaryTitle && (
                             <span className="featured-part">
@@ -283,8 +361,8 @@ function FeaturedContent() {
                             </span>
                         )}
 
-                        {isLive && content.title !== primaryTitle && (
-                            <p>{content.title}</p>
+                        {isLive && content.subtitle && (
+                            <p>{content.subtitle}</p>
                         )}
 
                         <div className="featured-meta">
@@ -304,13 +382,22 @@ function FeaturedContent() {
                             {publishedText && <span>{publishedText}</span>}
                         </div>
 
+                        {error && (
+                            <small className="featured-refresh-error">
+                                {error}
+                            </small>
+                        )}
+
                         <span className="featured-action">
                             {actionText}
                             <span aria-hidden="true"> →</span>
                         </span>
                     </div>
 
-                    <span className="featured-arrow" aria-hidden="true">
+                    <span
+                        className="featured-arrow"
+                        aria-hidden="true"
+                    >
                         ›
                     </span>
                 </div>
