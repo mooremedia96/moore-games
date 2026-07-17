@@ -35,6 +35,8 @@ jobs:
 
       - name: Build Vite site
         run: npm run build
+        env:
+          VITE_API_URL: https://api.mmooremedia.com
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
