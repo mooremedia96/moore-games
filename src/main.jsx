@@ -17,7 +17,7 @@ function Icon({ type }) {
     twitch: <path d="M3 2h19v13l-5 5h-5l-3 3v-3H5V6L3 2Zm4 3v11h4v2l2-2h4l3-3V5H7Zm4 3h2v5h-2V8Zm5 0h2v5h-2V8Z" />,
     discord: <path d="M19.4 5.4A15 15 0 0 0 15.5 4l-.6 1.2a14 14 0 0 0-5.8 0L8.5 4a15 15 0 0 0-3.9 1.4C2.1 9.2 1.4 13 1.7 16.7A16 16 0 0 0 6.5 19l1.2-1.6c-.7-.3-1.3-.6-1.9-1l.5-.4a11 11 0 0 0 11.4 0l.5.4c-.6.4-1.2.7-1.9 1l1.2 1.6a16 16 0 0 0 4.8-2.3c.4-4.3-.7-8-2.9-11.3ZM8.4 14.4c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm7.2 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z" />,
     instagram: <><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="2.4" /><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2.4" /><circle cx="17.4" cy="6.7" r="1.3" /></>,
-    facebook: <path d="M14 8h4V3.3c-.7-.1-2.3-.3-4.3-.3C9.5 3 6.6 5.5 6.6 10v3.7H2V19h4.6v13h5.7V19H17l.8-5.3h-5.5v-3.2C12.3 9 12.8 8 14 8Z" transform="scale(.75) translate(3 0)" />,
+    facebook: <path d="M14 8h4V3.3c-.7-.1-2.3-.3-4.3-.3C9.5 3 6.6 5.5 6.6 10v3.7H2V19h4.6v13h5.7V19H17l.8-5.3h-5.5v-3.2C12.3 9 12.8 8 14 8Z" transform="translate(3.2 0) scale(.75)"/>,
   };
   return <span className={`brand-icon ${type}`}><svg viewBox="0 0 24 24" aria-hidden="true">{icons[type]}</svg></span>;
 }
