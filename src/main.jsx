@@ -38,7 +38,7 @@ function App() {
       <main className="site-card">
         <header className="hero">
           <img
-            src={`${import.meta.env.BASE_URL}banner.jpeg`}
+            src={`${import.meta.env.BASE_URL}banner.webp`}
             alt="Moore Games space banner"
           />
           <div className="hero-shade" />
@@ -47,7 +47,7 @@ function App() {
         <section className="profile">
           <div className="avatar-wrap">
             <img
-              src={`${import.meta.env.BASE_URL}logo.jpeg`}
+              src={`${import.meta.env.BASE_URL}logo.svg`}
               alt="Moore Games logo"
             />
             <span className="online-dot" />
