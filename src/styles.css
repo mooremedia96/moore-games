@@ -1004,6 +1004,357 @@ h1 {
     box-shadow: 0 0 24px rgba(0, 115, 255, 0.46);
 }
 
+.link-card-button {
+    width: 100%;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.link-card:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+    border-color: #53baff;
+}
+
+/* =========================================================
+   BUSINESS CONTACT FORM
+   ========================================================= */
+
+.contact-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+
+    display: grid;
+    place-items: center;
+    overflow-y: auto;
+
+    padding:
+        max(22px, env(safe-area-inset-top))
+        18px
+        max(22px, env(safe-area-inset-bottom));
+
+    background: rgba(0, 2, 9, 0.82);
+    backdrop-filter: blur(10px);
+    animation: contact-backdrop-enter 0.2s ease both;
+}
+
+.contact-dialog {
+    position: relative;
+
+    width: min(100%, 620px);
+    padding: 28px;
+
+    border: 1px solid rgba(22, 135, 255, 0.72);
+    border-radius: 18px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(4, 13, 31, 0.98),
+            rgba(0, 3, 13, 0.98)
+        );
+
+    box-shadow:
+        0 0 38px rgba(0, 105, 255, 0.34),
+        inset 0 0 28px rgba(0, 76, 180, 0.06);
+
+    animation: contact-dialog-enter 0.24s ease both;
+}
+
+.contact-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+
+    display: grid;
+    place-items: center;
+
+    width: 38px;
+    height: 38px;
+    padding: 0;
+
+    color: #dceeff;
+    font-size: 28px;
+    line-height: 1;
+
+    border: 1px solid rgba(64, 154, 255, 0.45);
+    border-radius: 10px;
+    background: rgba(0, 5, 18, 0.82);
+
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.contact-close:hover,
+.contact-close:focus-visible {
+    transform: translateY(-1px);
+    border-color: #65c1ff;
+    background: rgba(10, 48, 98, 0.88);
+}
+
+.contact-close:focus-visible,
+.contact-submit:focus-visible,
+.contact-field input:focus-visible,
+.contact-field select:focus-visible,
+.contact-field textarea:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+
+.contact-heading {
+    padding-right: 42px;
+}
+
+.contact-heading > span {
+    color: #1687ff;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 2.6px;
+}
+
+.contact-heading h2 {
+    margin: 7px 0 0;
+    font-size: 27px;
+    line-height: 1.15;
+}
+
+.contact-heading p {
+    max-width: 470px;
+    margin: 9px 0 22px;
+    color: #c8d1dd;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.contact-field-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.contact-field {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.contact-field > span:first-child {
+    color: #e7f3ff;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.contact-field em {
+    margin-left: 5px;
+    color: #7e91a9;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 600;
+}
+
+.contact-field input,
+.contact-field select,
+.contact-field textarea {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+
+    border: 1px solid rgba(36, 120, 224, 0.66);
+    border-radius: 9px;
+    background: rgba(0, 4, 15, 0.92);
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.contact-field textarea {
+    min-height: 132px;
+    resize: vertical;
+    line-height: 1.45;
+}
+
+.contact-field select {
+    color-scheme: dark;
+}
+
+.contact-field input:hover,
+.contact-field select:hover,
+.contact-field textarea:hover,
+.contact-field input:focus,
+.contact-field select:focus,
+.contact-field textarea:focus {
+    border-color: #4cadff;
+    box-shadow: 0 0 15px rgba(0, 105, 255, 0.18);
+}
+
+.contact-field [aria-invalid="true"] {
+    border-color: #ff5656;
+}
+
+.contact-field small {
+    color: #ff9a9a;
+    font-size: 10px;
+    line-height: 1.35;
+}
+
+.contact-character-count {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+
+    color: #70839a;
+    font-size: 9px;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+.contact-field:has(small) .contact-character-count {
+    bottom: 27px;
+}
+
+.contact-honeypot {
+    position: fixed;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+.contact-status {
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.45;
+    border-radius: 8px;
+}
+
+.contact-status-error {
+    color: #ffd5d5;
+    border: 1px solid rgba(255, 82, 82, 0.55);
+    background: rgba(110, 0, 0, 0.22);
+}
+
+.contact-submit {
+    min-height: 48px;
+    padding: 11px 18px;
+
+    color: #fff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 900;
+
+    border: 1px solid #1687ff;
+    border-radius: 10px;
+    background:
+        linear-gradient(
+            100deg,
+            rgba(9, 83, 180, 0.98),
+            rgba(0, 44, 116, 0.98)
+        );
+
+    box-shadow: 0 0 18px rgba(0, 96, 255, 0.3);
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.contact-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: #70c7ff;
+    box-shadow: 0 0 25px rgba(0, 115, 255, 0.5);
+}
+
+.contact-submit:disabled {
+    cursor: wait;
+    opacity: 0.68;
+}
+
+.contact-privacy {
+    margin: -3px 0 0;
+    color: #7f8ea1;
+    font-size: 10px;
+    text-align: center;
+}
+
+.contact-success {
+    padding: 42px 10px 18px;
+    text-align: center;
+}
+
+.contact-success > span {
+    display: grid;
+    place-items: center;
+
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 14px;
+
+    color: #fff;
+    font-size: 27px;
+    font-weight: 900;
+
+    border: 1px solid #22d98a;
+    border-radius: 50%;
+    background: rgba(16, 159, 94, 0.24);
+    box-shadow: 0 0 24px rgba(34, 217, 138, 0.38);
+}
+
+.contact-success h3 {
+    margin: 0;
+    font-size: 23px;
+}
+
+.contact-success p {
+    margin: 9px 0 22px;
+    color: #c8d1dd;
+    font-size: 13px;
+}
+
+.contact-success .contact-submit {
+    width: min(100%, 260px);
+}
+
+@keyframes contact-backdrop-enter {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes contact-dialog-enter {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.985);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 /* =========================================================
    PLATFORM ICONS
    ========================================================= */
@@ -1067,6 +1418,14 @@ h1 {
     background: #1877f2;
 
     box-shadow: 0 0 15px rgba(24, 119, 242, 0.45);
+}
+
+.brand-icon.email {
+    color: #fff;
+    background: linear-gradient(135deg, #075bd8, #159eff);
+
+    border: 1px solid rgba(106, 196, 255, 0.75);
+    box-shadow: 0 0 15px rgba(22, 135, 255, 0.48);
 }
 
 /* =========================================================
@@ -1339,6 +1698,20 @@ footer {
     .link-card {
         min-height: 62px;
     }
+
+    .contact-backdrop {
+        place-items: start center;
+        padding-inline: 12px;
+    }
+
+    .contact-dialog {
+        margin: auto 0;
+        padding: 24px 18px;
+    }
+
+    .contact-field-row {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* =========================================================
@@ -1480,6 +1853,22 @@ footer {
     footer {
         padding-bottom: 24px;
     }
+
+    .contact-heading h2 {
+        font-size: 24px;
+    }
+
+    .contact-heading p {
+        margin-bottom: 18px;
+    }
+
+    .contact-form {
+        gap: 13px;
+    }
+
+    .contact-field textarea {
+        min-height: 118px;
+    }
 }
 
 /* =========================================================
@@ -1508,7 +1897,11 @@ footer {
     .link-card,
     .profile-socials a,
     .stream-status,
-    .status-dot {
+    .status-dot,
+    .contact-backdrop,
+    .contact-dialog,
+    .contact-close,
+    .contact-submit {
         animation: none !important;
         transition: none !important;
     }

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import ContactForm from "./ContactForm";
 import FeaturedContent from "./FeaturedContent";
 import "./styles.css";
 
@@ -27,6 +28,12 @@ const links = [
   { name: "Discord", text: "Join the community", url: "https://discord.com/invite/NKcxKnMBG", type: "discord" },
   { name: "Instagram", text: "Behind the scenes & updates", url: "https://www.instagram.com/mooregames96/", type: "instagram" },
   { name: "Facebook", text: "Follow for news & updates", url: "https://www.facebook.com/mooregames96", type: "facebook" },
+  {
+    name: "Business Contact",
+    text: "Sponsorships, collaborations & inquiries",
+    type: "email",
+    action: "contact",
+  },
 ];
 
 const profileLinks = links.slice(0, 3);
@@ -54,6 +61,28 @@ function Icon({ type }) {
     discord: <path d="M19.4 5.4A15 15 0 0 0 15.5 4l-.6 1.2a14 14 0 0 0-5.8 0L8.5 4a15 15 0 0 0-3.9 1.4C2.1 9.2 1.4 13 1.7 16.7A16 16 0 0 0 6.5 19l1.2-1.6c-.7-.3-1.3-.6-1.9-1l.5-.4a11 11 0 0 0 11.4 0l.5.4c-.6.4-1.2.7-1.9 1l1.2 1.6a16 16 0 0 0 4.8-2.3c.4-4.3-.7-8-2.9-11.3ZM8.4 14.4c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm7.2 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z" />,
     instagram: <><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="2.4" /><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2.4" /><circle cx="17.4" cy="6.7" r="1.3" /></>,
     facebook: <path d="M13.8 22v-8h2.9l.4-3.1h-3.3V8.9c0-.9.3-1.6 1.8-1.6H17V4.5c-.3 0-1.4-.1-2.6-.1-2.6 0-4.6 1.6-4.6 4.6v1.9H7v3.1h3V22h3.6Z" />,
+    email: (
+      <>
+        <rect
+          x="3"
+          y="5"
+          width="18"
+          height="14"
+          rx="2"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        />
+        <path
+          d="m5 7 7 5 7-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </>
+    ),
   };
 
   return (
@@ -63,12 +92,35 @@ function Icon({ type }) {
   );
 }
 
-function LinkCard({ item }) {
-  return (
-    <a className="link-card" href={item.url} target="_blank" rel="noreferrer">
+function LinkCard({ item, onContactOpen }) {
+  const content = (
+    <>
       <Icon type={item.type} />
       <span className="link-copy"><strong>{item.name}</strong><small>{item.text}</small></span>
       <span className="chevron" aria-hidden="true">›</span>
+    </>
+  );
+
+  if (item.action === "contact") {
+    return (
+      <button
+        className="link-card link-card-button"
+        type="button"
+        onClick={onContactOpen}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <a
+      className="link-card"
+      href={item.url}
+      target="_blank"
+      rel="noreferrer"
+    >
+      {content}
     </a>
   );
 }
@@ -139,6 +191,7 @@ function App() {
   const [contentTransitioning, setContentTransitioning] = useState(false);
   const [pullState, setPullState] = useState("idle");
   const [pullDistance, setPullDistance] = useState(0);
+  const [contactOpen, setContactOpen] = useState(false);
 
   const appRef = useRef(null);
   const dashboardRef = useRef(null);
@@ -148,6 +201,14 @@ function App() {
   const touchStartYRef = useRef(null);
   const pullActiveRef = useRef(false);
   const pullDistanceRef = useRef(0);
+
+  const openContact = useCallback(() => {
+    setContactOpen(true);
+  }, []);
+
+  const closeContact = useCallback(() => {
+    setContactOpen(false);
+  }, []);
 
   const applyDashboard = useCallback((nextDashboard) => {
     const currentDashboard = dashboardRef.current;
@@ -276,6 +337,7 @@ function App() {
         event.touches.length !== 1 ||
         !pageIsAtTop() ||
         requestRef.current ||
+        contactOpen ||
         !window.matchMedia("(max-width: 700px)").matches
       ) {
         return;
@@ -395,7 +457,7 @@ function App() {
         true
       );
     };
-  }, [refreshFromPull]);
+  }, [contactOpen, refreshFromPull]);
 
   return (
     <div
@@ -457,12 +519,23 @@ function App() {
           />
 
           <section className="links-panel">
-            {links.map((item) => <LinkCard key={item.name} item={item} />)}
+            {links.map((item) => (
+              <LinkCard
+                key={item.name}
+                item={item}
+                onContactOpen={openContact}
+              />
+            ))}
           </section>
 
           <footer>© {new Date().getFullYear()} Moore Games. All Rights Reserved.</footer>
         </main>
       )}
+
+      <ContactForm
+        open={contactOpen}
+        onClose={closeContact}
+      />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import {
 } from "express-rate-limit";
 
 import { getDashboard } from "./routes/dashboard.mjs";
+import { submitContact } from "./routes/contact.mjs";
 
 import {
     exchangeYouTubeAuthorizationCode,
@@ -82,8 +83,26 @@ const authorizationRateLimiter = rateLimit({
     },
 });
 
+const contactRateLimiter = rateLimit({
+    windowMs: 15 * 60_000,
+    limit: 5,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    keyGenerator: rateLimitKey,
+    message: {
+        error:
+            "Too many contact attempts. Please try again later.",
+    },
+});
+
 app.disable("x-powered-by");
 app.use(helmet());
+app.use(
+    express.json({
+        limit: "12kb",
+        type: "application/json",
+    })
+);
 
 app.use(
     cors({
@@ -96,7 +115,7 @@ app.use(
             console.warn(`Blocked CORS origin: ${origin}`);
             return callback(new Error("Not allowed by CORS"));
         },
-        methods: ["GET", "OPTIONS"],
+        methods: ["GET", "POST", "OPTIONS"],
         credentials: false,
         maxAge: 86_400,
     })
@@ -223,6 +242,12 @@ app.get("/api/dashboard", async (request, response) => {
     }
 });
 
+app.post(
+    "/api/contact",
+    contactRateLimiter,
+    submitContact
+);
+
 app.use((request, response) => {
     response.status(404).json({
         error: "Route not found.",
@@ -233,6 +258,22 @@ app.use((error, request, response, next) => {
     if (error?.message === "Not allowed by CORS") {
         return response.status(403).json({
             error: "Origin not allowed.",
+        });
+    }
+
+    if (error?.type === "entity.too.large") {
+        return response.status(413).json({
+            error: "Request body is too large.",
+        });
+    }
+
+    if (
+        error instanceof SyntaxError &&
+        error?.status === 400 &&
+        "body" in error
+    ) {
+        return response.status(400).json({
+            error: "Invalid JSON request.",
         });
     }
 
