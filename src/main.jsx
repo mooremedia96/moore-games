@@ -315,8 +315,8 @@ function App() {
       }
 
       if (event.cancelable) {
-  event.preventDefault();
-}
+        event.preventDefault();
+      }
 
       const resistedDistance = Math.min(
         MAX_PULL_DISTANCE,
