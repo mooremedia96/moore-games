@@ -1,13 +1,13 @@
 import {
     getDefaultTwitchStatus,
     getTwitchStatus,
-} from "./twitch.mjs";
+} from "../services/twitch.mjs";
 
 import {
     getDefaultYouTubeLiveStatus,
     getLatestYouTubeVideo,
     getYouTubeLiveStatus,
-} from "./youtube.mjs";
+} from "../services/youtube.mjs";
 
 export async function getDashboard() {
     const [

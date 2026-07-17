@@ -1,12 +1,12 @@
 import "dotenv/config";
 import express from "express";
 
-import { getDashboard } from "./dashboard.mjs";
+import { getDashboard } from "./routes/dashboard.mjs";
 
 import {
     exchangeYouTubeAuthorizationCode,
     getYouTubeAuthorizationUrl,
-} from "./youtube.mjs";
+} from "./services/youtube.mjs";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
