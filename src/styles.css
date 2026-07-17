@@ -22,7 +22,7 @@ body,
 }
 
 html {
-    overscroll-behavior-y: auto;
+    overscroll-behavior-y: none;    
 }
 
 body {
@@ -1249,23 +1249,6 @@ footer {
    ========================================================= */
 
 @media (max-width: 700px) {
-    html,
-    body,
-    #root,
-    .app-bg {
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-
-    html::-webkit-scrollbar,
-    body::-webkit-scrollbar,
-    #root::-webkit-scrollbar,
-    .app-bg::-webkit-scrollbar {
-        display: none;
-        width: 0;
-        height: 0;
-    }
-
     .app-bg {
         padding: 0;
     }

@@ -1,4 +1,4 @@
-const FALLBACK_IMAGE = `${import.meta.env.BASE_URL}banner-800.webp`;
+const FALLBACK_IMAGE = `${import.meta.env.BASE_URL}banner.webp`;
 
 function parseVideoTitle(title = "") {
     const normalizedTitle = title.trim();
