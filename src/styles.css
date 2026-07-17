@@ -21,6 +21,10 @@ body,
     background: #000;
 }
 
+html {
+    overscroll-behavior-y: none;    
+}
+
 body {
     min-height: 100vh;
 }
@@ -1052,26 +1056,30 @@ footer {
 
     .app-bg::before {
         position: fixed;
-        top: -40px;
-        right: -40px;
-        bottom: -40px;
-        left: -40px;
+        inset: auto;
 
-        width: auto;
-        height: auto;
+        top: 0;
+        left: 0;
+
+        width: 100vw;
+        height: 100lvh;
 
         background-size: cover;
         background-position: center top;
 
-        filter: blur(3px) brightness(.68);
-        transform: none;
+        filter: blur(3px) brightness(0.68);
+
+        transform: translateZ(0) scale(1.04);
+        transform-origin: center top;
+        will-change: transform;
     }
 
     .site-card {
+        width: 100%;
+        min-height: 100svh;
+
         border: 0;
         border-radius: 0;
-        width: 100%;
-        min-height: 100vh;
     }
 
     .hero {
@@ -1110,16 +1118,16 @@ footer {
 
 @media (max-width: 430px) {
     .app-bg::before {
-        top: -50px;
-        right: -50px;
-        bottom: -50px;
-        left: -50px;
+        width: 100vw;
+        height: 100lvh;
 
         background-size: cover;
         background-position: center top;
 
-        filter: blur(3px) brightness(.64);
-        transform: none;
+        filter: blur(3px) brightness(0.64);
+
+        transform: translateZ(0) scale(1.05);
+        transform-origin: center top;
     }
 
     .hero {
