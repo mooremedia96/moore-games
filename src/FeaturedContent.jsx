@@ -8,7 +8,7 @@ const FALLBACK_CONTENT = {
     platform: "youtube",
     title: "Watch Moore Games on YouTube",
     subtitle: "Gameplay, playthroughs, and more",
-    thumbnail: `${import.meta.env.BASE_URL}banner.jpeg`,
+    thumbnail: FALLBACK_IMAGE,
     url: "https://www.youtube.com/@mooregames96",
     publishedAt: "",
     startedAt: "",
@@ -319,13 +319,17 @@ function FeaturedContent() {
             >
                 <div className="featured-thumbnail">
                     <img
-                        src={content.thumbnail || FALLBACK_CONTENT.thumbnail}
-                        alt={content.title}
+                        src={content.thumbnail || FALLBACK_IMAGE}
+                        alt={content.title || "Moore Games featured content"}
                         onError={(event) => {
                             const image = event.currentTarget;
 
-                            image.onerror = null;
-                            image.src = `${import.meta.env.BASE_URL}banner.jpeg`;
+                            if (image.dataset.fallbackApplied === "true") {
+                                return;
+                            }
+
+                            image.dataset.fallbackApplied = "true";
+                            image.src = FALLBACK_IMAGE;
                         }}
                     />
 
