@@ -47,7 +47,7 @@ body {
     inset: -3%;
     z-index: -2;
 
-    background-image: url("/space-bg.png");
+    background-image: url("/space-bg.webp");
     background-repeat: no-repeat;
     background-position: center top;
     background-size: cover;
