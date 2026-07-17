@@ -108,7 +108,7 @@ async function buildDashboard() {
             title: "Watch Moore Games on YouTube",
             subtitle: "Gameplay, playthroughs, and more",
             thumbnail:
-                "https://mooremedia96.github.io/moore-games/banner.jpeg",
+                "https://mooremedia96.github.io/moore-games/banner.webp",
             url: "https://www.youtube.com/@mooregames96",
         };
     }
