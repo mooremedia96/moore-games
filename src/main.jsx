@@ -37,13 +37,19 @@ function App() {
     <div className="app-bg">
       <main className="site-card">
         <header className="hero">
-          <img src="/banner.jpeg" alt="Moore Games space banner" />
+          <img
+            src={`${import.meta.env.BASE_URL}banner.jpeg`}
+            alt="Moore Games space banner"
+          />
           <div className="hero-shade" />
         </header>
 
         <section className="profile">
           <div className="avatar-wrap">
-            <img src="/logo-crop.jpeg" alt="Moore Games logo" />
+            <img
+              src={`${import.meta.env.BASE_URL}logo.jpeg`}
+              alt="Moore Games logo"
+            />
             <span className="online-dot" />
           </div>
           <h1>Moore Games</h1>
