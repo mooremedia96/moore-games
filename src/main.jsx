@@ -13,7 +13,7 @@ const FALLBACK_CONTENT = {
   platform: "youtube",
   title: "Watch Moore Games on YouTube",
   subtitle: "Gameplay, playthroughs, and more",
-  thumbnail: `${import.meta.env.BASE_URL}banner.webp`,
+  thumbnail: `${import.meta.env.BASE_URL}banner-800.webp`,
   url: "https://www.youtube.com/@mooregames96",
   publishedAt: "",
   startedAt: "",
@@ -28,6 +28,8 @@ const links = [
   { name: "Instagram", text: "Behind the scenes & updates", url: "https://www.instagram.com/mooregames96/", type: "instagram" },
   { name: "Facebook", text: "Follow for news & updates", url: "https://www.facebook.com/mooregames96", type: "facebook" },
 ];
+
+const profileLinks = links.slice(0, 3);
 
 function createContentSignature(content) {
   return JSON.stringify({
@@ -79,6 +81,9 @@ function InitialPageSkeleton() {
         <span className="page-skeleton-avatar" />
         <span className="skeleton-line page-skeleton-name" />
         <span className="skeleton-line page-skeleton-role" />
+        <div className="page-skeleton-profile-socials">
+          {profileLinks.map((item) => <span key={item.name} />)}
+        </div>
         <span className="skeleton-line page-skeleton-bio" />
       </section>
       <section className="featured-content">
@@ -96,9 +101,6 @@ function InitialPageSkeleton() {
       <section className="links-panel page-skeleton-links">
         {links.map((item) => <span className="page-skeleton-link" key={item.name} />)}
       </section>
-      <div className="page-skeleton-socials">
-        {links.map((item) => <span key={item.name} />)}
-      </div>
     </main>
   );
 }
@@ -138,12 +140,14 @@ function App() {
   const [pullState, setPullState] = useState("idle");
   const [pullDistance, setPullDistance] = useState(0);
 
+  const appRef = useRef(null);
   const dashboardRef = useRef(null);
   const requestRef = useRef(null);
   const transitionTimerRef = useRef(null);
   const pullResetTimerRef = useRef(null);
   const touchStartYRef = useRef(null);
   const pullActiveRef = useRef(false);
+  const pullDistanceRef = useRef(0);
 
   const applyDashboard = useCallback((nextDashboard) => {
     const currentDashboard = dashboardRef.current;
@@ -233,6 +237,7 @@ function App() {
   const finishPullRefresh = useCallback((state) => {
     setPullState(state);
     setPullDistance(0);
+    pullDistanceRef.current = 0;
     window.clearTimeout(pullResetTimerRef.current);
     pullResetTimerRef.current = window.setTimeout(() => setPullState("idle"), 1200);
   }, []);
@@ -240,6 +245,7 @@ function App() {
   const refreshFromPull = useCallback(async () => {
     setPullState("refreshing");
     setPullDistance(PULL_THRESHOLD);
+    pullDistanceRef.current = PULL_THRESHOLD;
 
     try {
       const changed = await loadDashboard({ manual: true });
@@ -249,69 +255,153 @@ function App() {
     }
   }, [finishPullRefresh, loadDashboard]);
 
-  function handleTouchStart(event) {
-    if (
-      window.scrollY !== 0 ||
-      pullState === "refreshing" ||
-      !window.matchMedia("(max-width: 700px)").matches
-    ) {
-      return;
+  useEffect(() => {
+    const appElement = appRef.current;
+
+    if (!appElement) {
+      return undefined;
     }
 
-    touchStartYRef.current = event.touches[0].clientY;
-    pullActiveRef.current = true;
-  }
+    function pageIsAtTop() {
+      const scrollTop =
+        document.scrollingElement?.scrollTop ??
+        document.documentElement.scrollTop ??
+        window.scrollY;
 
-  function handleTouchMove(event) {
-    if (!pullActiveRef.current || touchStartYRef.current === null) {
-      return;
+      return scrollTop <= 1;
     }
 
-    if (window.scrollY > 0) {
+    function handleTouchStart(event) {
+      if (
+        event.touches.length !== 1 ||
+        !pageIsAtTop() ||
+        requestRef.current ||
+        !window.matchMedia("(max-width: 700px)").matches
+      ) {
+        return;
+      }
+
+      touchStartYRef.current = event.touches[0].clientY;
+      pullActiveRef.current = true;
+      pullDistanceRef.current = 0;
+    }
+
+    function resetPull() {
       pullActiveRef.current = false;
       touchStartYRef.current = null;
-      setPullDistance(0);
-      setPullState("idle");
-      return;
-    }
-
-    const rawDistance = event.touches[0].clientY - touchStartYRef.current;
-
-    if (rawDistance <= 0) {
-      return;
-    }
-
-    event.preventDefault();
-    const resistedDistance = Math.min(MAX_PULL_DISTANCE, rawDistance * 0.48);
-    setPullDistance(resistedDistance);
-    setPullState(resistedDistance >= PULL_THRESHOLD ? "ready" : "pulling");
-  }
-
-  function handleTouchEnd() {
-    if (!pullActiveRef.current) {
-      return;
-    }
-
-    const shouldRefresh = pullDistance >= PULL_THRESHOLD;
-    pullActiveRef.current = false;
-    touchStartYRef.current = null;
-
-    if (shouldRefresh) {
-      refreshFromPull();
-    } else {
+      pullDistanceRef.current = 0;
       setPullDistance(0);
       setPullState("idle");
     }
-  }
+
+    function handleTouchMove(event) {
+      if (
+        !pullActiveRef.current ||
+        touchStartYRef.current === null ||
+        event.touches.length !== 1
+      ) {
+        return;
+      }
+
+      if (!pageIsAtTop()) {
+        resetPull();
+        return;
+      }
+
+      const rawDistance =
+        event.touches[0].clientY - touchStartYRef.current;
+
+      if (rawDistance <= 0) {
+        resetPull();
+        return;
+      }
+
+      if (event.cancelable) {
+        event.preventDefault();
+      }
+
+      const resistedDistance = Math.min(
+        MAX_PULL_DISTANCE,
+        rawDistance * 0.48
+      );
+
+      pullDistanceRef.current = resistedDistance;
+      setPullDistance(resistedDistance);
+      setPullState(
+        resistedDistance >= PULL_THRESHOLD ? "ready" : "pulling"
+      );
+    }
+
+    function handleTouchEnd() {
+      if (!pullActiveRef.current) {
+        return;
+      }
+
+      const shouldRefresh =
+        pullDistanceRef.current >= PULL_THRESHOLD;
+
+      pullActiveRef.current = false;
+      touchStartYRef.current = null;
+
+      if (shouldRefresh) {
+        refreshFromPull();
+      } else {
+        pullDistanceRef.current = 0;
+        setPullDistance(0);
+        setPullState("idle");
+      }
+    }
+
+    document.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+      capture: true,
+    });
+
+    document.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+      capture: true,
+    });
+
+    document.addEventListener("touchend", handleTouchEnd, {
+      capture: true,
+    });
+
+    document.addEventListener("touchcancel", handleTouchEnd, {
+      capture: true,
+    });
+
+    return () => {
+      document.removeEventListener(
+        "touchstart",
+        handleTouchStart,
+        true
+      );
+
+      document.removeEventListener(
+        "touchmove",
+        handleTouchMove,
+        true
+      );
+
+      document.removeEventListener(
+        "touchend",
+        handleTouchEnd,
+        true
+      );
+
+      document.removeEventListener(
+        "touchcancel",
+        handleTouchEnd,
+        true
+      );
+    };
+  }, [refreshFromPull]);
 
   return (
     <div
+      ref={appRef}
       className={`app-bg ${pullState !== "idle" ? "pull-active" : ""}`}
       style={{ "--pull-distance": `${pullDistance}px` }}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onTouchCancel={handleTouchEnd}
     >
       <PullToRefreshIndicator state={pullState} distance={pullDistance} />
 
@@ -320,17 +410,43 @@ function App() {
       ) : (
         <main className="site-card site-card-loaded">
           <header className="hero">
-            <img src={`${import.meta.env.BASE_URL}banner.webp`} alt="Moore Games space banner" />
+            <img
+              src={`${import.meta.env.BASE_URL}banner-800.webp`}
+              srcSet={[
+                `${import.meta.env.BASE_URL}banner-800.webp 800w`,
+                `${import.meta.env.BASE_URL}banner-1600.webp 1600w`,
+              ].join(", ")}
+              sizes="(max-width: 700px) 100vw, 760px"
+              width="1600"
+              height="696"
+              fetchPriority="high"
+              decoding="async"
+              alt="Moore Games space banner"
+            />
             <div className="hero-shade" />
           </header>
 
           <section className="profile">
             <div className="avatar-wrap">
-              <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Moore Games logo" />
+              <img src={`${import.meta.env.BASE_URL}logo.webp`} alt="Moore Games logo" />
               <span className="online-dot" />
             </div>
             <h1>Moore Games</h1>
             <div className="roles">Gamer <span>•</span> Content Creator <span>•</span> Community</div>
+            <nav className="profile-socials" aria-label="Primary social links">
+              {profileLinks.map((item) => (
+                <a
+                  href={item.url}
+                  key={item.name}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={item.name}
+                  title={item.name}
+                >
+                  <Icon type={item.type} />
+                </a>
+              ))}
+            </nav>
             <p>SoCal based variety streamer and content creator. If you like space sims, extraction shooters, fps, and other gameplay; Welcome to Moore Games!</p>
           </section>
 
@@ -343,14 +459,6 @@ function App() {
           <section className="links-panel">
             {links.map((item) => <LinkCard key={item.name} item={item} />)}
           </section>
-
-          <nav className="social-row" aria-label="Social media links">
-            {links.map((item) => (
-              <a href={item.url} key={item.name} target="_blank" rel="noreferrer" aria-label={item.name}>
-                <Icon type={item.type} />
-              </a>
-            ))}
-          </nav>
 
           <footer>© {new Date().getFullYear()} Moore Games. All Rights Reserved.</footer>
         </main>

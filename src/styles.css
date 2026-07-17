@@ -22,7 +22,7 @@ body,
 }
 
 html {
-    overscroll-behavior-y: none;    
+    overscroll-behavior-y: auto;
 }
 
 body {
@@ -106,7 +106,7 @@ body {
 .page-skeleton-hero,
 .page-skeleton-avatar,
 .page-skeleton-link,
-.page-skeleton-socials span {
+.page-skeleton-profile-socials span {
     background:
         linear-gradient(100deg,
             rgba(8, 18, 38, 0.96) 30%,
@@ -167,18 +167,18 @@ body {
     border-radius: 12px;
 }
 
-.page-skeleton-socials {
+.page-skeleton-profile-socials {
     display: flex;
     justify-content: center;
-    gap: 17px;
-    margin: 15px auto 18px;
+    gap: 10px;
+    margin: 11px auto 0;
 }
 
-.page-skeleton-socials span {
-    width: 47px;
-    height: 47px;
+.page-skeleton-profile-socials span {
+    width: 34px;
+    height: 34px;
     border: 1px solid rgba(30, 116, 255, 0.4);
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 /* =========================================================
@@ -290,6 +290,48 @@ h1 {
 .roles span {
     padding: 0 7px;
     color: #1f91ff;
+}
+
+.profile-socials {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 11px auto 0;
+}
+
+.profile-socials a {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    text-decoration: none;
+    border: 1px solid rgba(30, 116, 255, 0.55);
+    border-radius: 9px;
+    background: rgba(0, 4, 14, 0.82);
+    box-shadow: 0 0 12px rgba(0, 79, 210, 0.14);
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.profile-socials a:hover,
+.profile-socials a:focus-visible {
+    transform: translateY(-2px);
+    border-color: #5bbfff;
+    box-shadow: 0 0 17px rgba(0, 115, 255, 0.3);
+}
+
+.profile-socials .brand-icon {
+    flex-basis: 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+}
+
+.profile-socials .brand-icon svg {
+    width: 20px;
+    height: 20px;
 }
 
 .profile p {
@@ -1157,62 +1199,11 @@ h1 {
 }
 
 /* =========================================================
-   SOCIAL ICON ROW
-   ========================================================= */
-
-.social-row {
-    display: flex;
-    justify-content: center;
-    gap: 17px;
-
-    margin: 15px auto 18px;
-}
-
-.social-row a {
-    display: grid;
-    place-items: center;
-
-    width: 47px;
-    height: 47px;
-
-    text-decoration: none;
-
-    border: 1px solid rgba(30, 116, 255, 0.65);
-    border-radius: 10px;
-
-    background: rgba(0, 4, 14, 0.9);
-
-    box-shadow: 0 0 16px rgba(0, 79, 210, 0.16);
-
-    transition:
-        transform 0.2s ease,
-        border-color 0.2s ease;
-}
-
-.social-row a:hover {
-    transform: translateY(-2px);
-    border-color: #5bbfff;
-}
-
-.social-row .brand-icon {
-    flex-basis: 34px;
-
-    width: 34px;
-    height: 34px;
-
-    border-radius: 7px;
-}
-
-.social-row .brand-icon svg {
-    width: 24px;
-    height: 24px;
-}
-
-/* =========================================================
    FOOTER
    ========================================================= */
 
 footer {
+    margin-top: 18px;
     padding-bottom: 19px;
 
     color: #b4bbc5;
@@ -1249,6 +1240,23 @@ footer {
    ========================================================= */
 
 @media (max-width: 700px) {
+    html,
+    body,
+    #root,
+    .app-bg {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar,
+    #root::-webkit-scrollbar,
+    .app-bg::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+    }
+
     .app-bg {
         padding: 0;
     }
@@ -1469,15 +1477,6 @@ footer {
         margin-top: 13px;
     }
 
-    .social-row {
-        gap: 11px;
-    }
-
-    .social-row a {
-        width: 44px;
-        height: 44px;
-    }
-
     footer {
         padding-bottom: 24px;
     }
@@ -1493,7 +1492,7 @@ footer {
     .page-skeleton-hero,
     .page-skeleton-avatar,
     .page-skeleton-link,
-    .page-skeleton-socials span,
+    .page-skeleton-profile-socials span,
     .pull-refresh,
     .pull-refresh-icon,
     .featured-card,
@@ -1507,7 +1506,7 @@ footer {
     .featured-skeleton-thumbnail,
     .skeleton-line,
     .link-card,
-    .social-row a,
+    .profile-socials a,
     .stream-status,
     .status-dot {
         animation: none !important;
