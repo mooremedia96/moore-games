@@ -61,8 +61,6 @@ export async function sendContactEmail(contact) {
         : "";
 
     const text = [
-        "New Moore Games business inquiry",
-        "",
         `Name: ${contact.name}`,
         `Email: ${contact.email}`,
         organizationLine.trimEnd(),
@@ -85,7 +83,6 @@ export async function sendContactEmail(contact) {
 
     const html = `
         <main style="font-family: Arial, sans-serif; color: #111827; line-height: 1.5;">
-            <h1 style="font-size: 22px;">New Moore Games business inquiry</h1>
             <p><strong>Name:</strong> ${escapeHtml(contact.name)}</p>
             <p><strong>Email:</strong> ${escapeHtml(contact.email)}</p>
             ${organizationHtml}
