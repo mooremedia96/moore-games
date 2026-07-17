@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-const REFRESH_INTERVAL = 15_000;
+const REFRESH_INTERVAL = 60_000;
 
 const FALLBACK_CONTENT = {
     type: "video",
