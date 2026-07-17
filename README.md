@@ -4,6 +4,7 @@ This website was a test to see how far I could go using ChatGPT to create a full
 Any suggestions and or constructive feedback are welcome!
 
 Recent Additions...
+
 Automatic Switch Between Latest Video (From YouTube), to Live on Twitch and YouTube (with colors representing both, purple and red)
 Working Contact Page!
 
