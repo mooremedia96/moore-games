@@ -63,26 +63,15 @@ app.get(
                 await exchangeYouTubeAuthorizationCode(
                     code
                 );
-
-            console.log(
-                "\nYouTube authorization successful."
-            );
+            console.log("YouTube authorization successful.");
 
             if (tokens.refresh_token) {
                 console.log(
-                    "\nAdd this line to your .env file:\n"
-                );
-
-                console.log(
-                    `YOUTUBE_REFRESH_TOKEN=${tokens.refresh_token}`
-                );
-
-                console.log(
-                    "\nThen restart the API.\n"
+                    "A new refresh token was received. Update your .env if you intend to replace the existing token."
                 );
             } else {
                 console.log(
-                    "Google did not return a new refresh token."
+                    "Authorization completed using the existing refresh token."
                 );
             }
 
@@ -111,7 +100,6 @@ app.get(
         }
     }
 );
-
 app.get("/api/dashboard", async (request, response) => {
     try {
         const dashboard = await getDashboard();
