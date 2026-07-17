@@ -9,7 +9,13 @@ import {
     getYouTubeLiveStatus,
 } from "../services/youtube.mjs";
 
-export async function getDashboard() {
+const CACHE_DURATION = 45_000;
+
+let dashboardCache = null;
+let dashboardCacheTime = 0;
+let dashboardRequestPromise = null;
+
+async function buildDashboard() {
     const [
         twitchResult,
         youtubeLiveResult,
@@ -101,7 +107,8 @@ export async function getDashboard() {
             platform: "youtube",
             title: "Watch Moore Games on YouTube",
             subtitle: "Gameplay, playthroughs, and more",
-            thumbnail: "/banner.jpeg",
+            thumbnail:
+                "https://mooremedia96.github.io/moore-games/banner.jpeg",
             url: "https://www.youtube.com/@mooregames96",
         };
     }
@@ -113,4 +120,33 @@ export async function getDashboard() {
         latestVideo,
         updatedAt: new Date().toISOString(),
     };
+}
+
+export async function getDashboard() {
+    const now = Date.now();
+
+    const cacheIsFresh =
+        dashboardCache &&
+        now - dashboardCacheTime < CACHE_DURATION;
+
+    if (cacheIsFresh) {
+        return dashboardCache;
+    }
+
+    if (dashboardRequestPromise) {
+        return dashboardRequestPromise;
+    }
+
+    dashboardRequestPromise = buildDashboard()
+        .then((dashboard) => {
+            dashboardCache = dashboard;
+            dashboardCacheTime = Date.now();
+
+            return dashboard;
+        })
+        .finally(() => {
+            dashboardRequestPromise = null;
+        });
+
+    return dashboardRequestPromise;
 }
