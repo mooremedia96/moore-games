@@ -275,14 +275,22 @@ export async function getLatestYouTubeVideo() {
             const isPublic =
                 video.status?.privacyStatus === "public";
 
+            const wasLivestream = Boolean(
+                video.liveStreamingDetails?.actualStartTime
+            );
+
             const durationSeconds = parseYouTubeDuration(
                 video.contentDetails?.duration
             );
 
+            const meetsDurationRequirement =
+                !wasLivestream ||
+                durationSeconds >= MIN_FEATURED_VIDEO_SECONDS;
+
             return (
                 !isLiveOrUpcoming &&
                 isPublic &&
-                durationSeconds >= MIN_FEATURED_VIDEO_SECONDS
+                meetsDurationRequirement
             );
         });
 
