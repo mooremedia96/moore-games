@@ -19,6 +19,28 @@ const youtubeOAuth = new google.auth.OAuth2(
     GOOGLE_REDIRECT_URI
 );
 
+const MIN_FEATURED_VIDEO_SECONDS = 30 * 60;
+
+function parseYouTubeDuration(duration = "") {
+    const match = duration.match(
+        /^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/
+    );
+
+    if (!match) {
+        return 0;
+    }
+
+    const [, days = 0, hours = 0, minutes = 0, seconds = 0] =
+        match;
+
+    return (
+        Number(days) * 86400 +
+        Number(hours) * 3600 +
+        Number(minutes) * 60 +
+        Number(seconds)
+    );
+}
+
 if (YOUTUBE_REFRESH_TOKEN) {
     youtubeOAuth.setCredentials({
         refresh_token: YOUTUBE_REFRESH_TOKEN,
@@ -189,7 +211,7 @@ export async function getLatestYouTubeVideo() {
     const playlistParameters = new URLSearchParams({
         part: "snippet,contentDetails",
         playlistId: uploadsPlaylistId,
-        maxResults: "10",
+        maxResults: "50",
         key: YOUTUBE_API_KEY,
     });
 
@@ -219,7 +241,7 @@ export async function getLatestYouTubeVideo() {
     }
 
     const videoParameters = new URLSearchParams({
-        part: "snippet,status,liveStreamingDetails",
+        part: "snippet,status,contentDetails,liveStreamingDetails",
         id: videoIds.join(","),
         key: YOUTUBE_API_KEY,
     });
@@ -246,22 +268,21 @@ export async function getLatestYouTubeVideo() {
                 return false;
             }
 
-            const wasLivestream = Boolean(
-                video.liveStreamingDetails?.actualStartTime
-            );
-
             const isLiveOrUpcoming =
                 video.snippet?.liveBroadcastContent === "live" ||
-                video.snippet?.liveBroadcastContent ===
-                "upcoming";
+                video.snippet?.liveBroadcastContent === "upcoming";
 
             const isPublic =
                 video.status?.privacyStatus === "public";
 
+            const durationSeconds = parseYouTubeDuration(
+                video.contentDetails?.duration
+            );
+
             return (
-                !wasLivestream &&
                 !isLiveOrUpcoming &&
-                isPublic
+                isPublic &&
+                durationSeconds >= MIN_FEATURED_VIDEO_SECONDS
             );
         });
 
