@@ -483,6 +483,7 @@ function App() {
               height="696"
               fetchPriority="high"
               decoding="async"
+              draggable={false}
               alt="Moore Games space banner"
             />
             <div className="hero-shade" />

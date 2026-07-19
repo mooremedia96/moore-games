@@ -1037,9 +1037,7 @@ h1 {
     overflow-y: auto;
 
     padding:
-        max(22px, env(safe-area-inset-top))
-        18px
-        max(22px, env(safe-area-inset-bottom));
+        max(22px, env(safe-area-inset-top)) 18px max(22px, env(safe-area-inset-bottom));
 
     background: rgba(0, 2, 9, 0.82);
     backdrop-filter: blur(10px);
@@ -1055,11 +1053,9 @@ h1 {
     border: 1px solid rgba(22, 135, 255, 0.72);
     border-radius: 18px;
     background:
-        linear-gradient(
-            145deg,
+        linear-gradient(145deg,
             rgba(4, 13, 31, 0.98),
-            rgba(0, 3, 13, 0.98)
-        );
+            rgba(0, 3, 13, 0.98));
 
     box-shadow:
         0 0 38px rgba(0, 105, 255, 0.34),
@@ -1115,7 +1111,7 @@ h1 {
     padding-right: 42px;
 }
 
-.contact-heading > span {
+.contact-heading>span {
     color: #1687ff;
     font-size: 10px;
     font-weight: 900;
@@ -1156,7 +1152,7 @@ h1 {
     gap: 7px;
 }
 
-.contact-field > span:first-child {
+.contact-field>span:first-child {
     color: #e7f3ff;
     font-size: 12px;
     font-weight: 800;
@@ -1299,11 +1295,9 @@ h1 {
     border: 1px solid #1687ff;
     border-radius: 10px;
     background:
-        linear-gradient(
-            100deg,
+        linear-gradient(100deg,
             rgba(9, 83, 180, 0.98),
-            rgba(0, 44, 116, 0.98)
-        );
+            rgba(0, 44, 116, 0.98));
 
     box-shadow: 0 0 18px rgba(0, 96, 255, 0.3);
     cursor: pointer;
@@ -1336,7 +1330,7 @@ h1 {
     text-align: center;
 }
 
-.contact-success > span {
+.contact-success>span {
     display: grid;
     place-items: center;
 
@@ -1635,6 +1629,7 @@ footer {
    ========================================================= */
 
 @media (max-width: 700px) {
+
     html,
     body,
     #root,
@@ -1674,6 +1669,18 @@ footer {
         transform: translateZ(0) scale(1.04);
         transform-origin: center top;
         will-change: transform;
+    }
+
+    .hero,
+    .hero img {
+        -webkit-touch-callout: none;
+    }
+
+    .hero img {
+        -webkit-user-drag: none;
+        -webkit-user-select: none;
+        user-select: none;
+        pointer-events: none;
     }
 
     .site-card {
