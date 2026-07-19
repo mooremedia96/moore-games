@@ -471,21 +471,17 @@ function App() {
         <InitialPageSkeleton />
       ) : (
         <main className="site-card site-card-loaded">
-          <header className="hero">
-            <img
-              src={`${import.meta.env.BASE_URL}banner-800.webp`}
-              srcSet={[
-                `${import.meta.env.BASE_URL}banner-800.webp 800w`,
-                `${import.meta.env.BASE_URL}banner-1600.webp 1600w`,
-              ].join(", ")}
-              sizes="(max-width: 700px) 100vw, 760px"
-              width="1600"
-              height="696"
-              fetchPriority="high"
-              decoding="async"
-              draggable={false}
-              alt="Moore Games space banner"
-            />
+          <header
+            className="hero"
+            role="img"
+            aria-label="Moore Games space banner"
+            style={{
+              "--banner-image-large":
+                `url("${import.meta.env.BASE_URL}banner-1600.webp")`,
+              "--banner-image-small":
+                `url("${import.meta.env.BASE_URL}banner-800.webp")`,
+            }}
+          >
             <div className="hero-shade" />
           </header>
 

@@ -194,14 +194,16 @@ body {
 .hero {
     position: relative;
     width: 100%;
+    aspect-ratio: 1600 / 696;
     overflow: hidden;
-}
 
-.hero img {
-    display: block;
-    width: 100%;
-    height: auto;
-    object-fit: cover;
+    background-color: #020610;
+    background-image: var(--banner-image-large);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+
+    -webkit-touch-callout: none;
 }
 
 .hero-shade {
@@ -1671,18 +1673,6 @@ footer {
         will-change: transform;
     }
 
-    .hero,
-    .hero img {
-        -webkit-touch-callout: none;
-    }
-
-    .hero img {
-        -webkit-user-drag: none;
-        -webkit-user-select: none;
-        user-select: none;
-        pointer-events: none;
-    }
-
     .site-card {
         width: 100%;
         min-height: 100svh;
@@ -1706,12 +1696,11 @@ footer {
 
     .hero {
         height: 235px;
-    }
+        aspect-ratio: auto;
 
-    .hero img {
-        height: 100%;
-        object-fit: cover;
-        object-position: center 49%;
+        background-image: var(--banner-image-small);
+        background-position: center 49%;
+        background-size: cover;
     }
 
     .profile {
@@ -1777,12 +1766,8 @@ footer {
 
     .hero {
         height: 205px;
-    }
-
-    .hero img {
-        height: 100%;
-        object-fit: cover;
-        transform: scale(1.08);
+        background-position: center 49%;
+        background-size: auto 108%;
     }
 
     .profile {
