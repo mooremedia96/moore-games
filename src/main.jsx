@@ -29,6 +29,12 @@ const links = [
   { name: "Instagram", text: "Behind the scenes & updates", url: "https://www.instagram.com/mooregames96/", type: "instagram" },
   { name: "Facebook", text: "Follow for news & updates", url: "https://www.facebook.com/mooregames96", type: "facebook" },
   {
+    name: "TikTok",
+    text: "Short clips, highlights & updates",
+    url: "https://www.tiktok.com/@mooregames96",
+    type: "tiktok",
+  },
+  {
     name: "Business Contact",
     text: "Sponsorships, collaborations & inquiries",
     type: "email",

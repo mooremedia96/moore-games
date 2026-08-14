@@ -1452,6 +1452,17 @@ h1 {
     box-shadow: 0 0 15px rgba(24, 119, 242, 0.45);
 }
 
+.brand-icon.tiktok {
+    color: #fff;
+    background: #050505;
+
+    border: 1px solid rgba(37, 244, 238, 0.75);
+
+    box-shadow:
+        -3px 0 12px rgba(37, 244, 238, 0.38),
+        3px 0 12px rgba(254, 44, 85, 0.38);
+}
+
 .brand-icon.email {
     color: #fff;
     background: linear-gradient(135deg, #075bd8, #159eff);
