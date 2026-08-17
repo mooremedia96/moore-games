@@ -105,7 +105,7 @@ function FeaturedContent({ content, error = "", transitioning = false }) {
         : "LATEST VIDEO";
     const categoryLabel = isLive
         ? content.game || (isTwitch ? "TWITCH STREAM" : "YOUTUBE LIVE")
-        : "CURRENT PLAYTHROUGH";
+        : "CURRENT VIDEO";
     const primaryTitle =
         !isLive && parsedVideo.series ? parsedVideo.series : content.title;
     const secondaryTitle =
