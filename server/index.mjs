@@ -24,8 +24,8 @@ const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:4173",
     "https://mooremedia96.github.io",
-    "https://moooregames.net",
-    "https://www.moooregames.net",
+    "https://mooregames.net",
+    "https://www.mooregames.net",
 ];
 
 const localHostnames = new Set([

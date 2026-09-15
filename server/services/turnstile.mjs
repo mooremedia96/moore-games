@@ -7,7 +7,7 @@ function getExpectedHostnames() {
     return new Set(
         (
             process.env.TURNSTILE_EXPECTED_HOSTNAMES ||
-            "mooremedia96.github.io,moooregames.net,www.moooregames.net"
+            "mooremedia96.github.io,mooregames.net,www.mooregames.net"
         )
             .split(",")
             .map((hostname) =>
