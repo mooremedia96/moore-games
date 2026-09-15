@@ -9,6 +9,10 @@ const PULL_THRESHOLD = 72;
 const MAX_PULL_DISTANCE = 108;
 const TRANSITION_DURATION = 180;
 
+function getPublicAssetUrl(filename) {
+  return new URL(`${import.meta.env.BASE_URL}${filename}`, document.baseURI).href;
+}
+
 const FALLBACK_CONTENT = {
   type: "video",
   platform: "youtube",
@@ -485,9 +489,9 @@ function App() {
             aria-label="Moore Games space banner"
             style={{
               "--banner-image-large":
-                `url("${import.meta.env.BASE_URL}banner-1600.webp")`,
+                `url("${getPublicAssetUrl("banner-1600.webp")}")`,
               "--banner-image-small":
-                `url("${import.meta.env.BASE_URL}banner-800.webp")`,
+                `url("${getPublicAssetUrl("banner-800.webp")}")`,
             }}
           >
             <div className="hero-shade" />
