@@ -29,7 +29,7 @@ const FALLBACK_CONTENT = {
 const links = [
   { name: "YouTube", text: "Subscribe for videos & live streams", url: "https://www.youtube.com/channel/UCMU9AQML1qV7Y1RJpc5lR9Q?sub_confirmation=1", type: "youtube" },
   { name: "Twitch", text: "Catch me live on Twitch", url: "https://www.twitch.tv/mooregames96", type: "twitch" },
-  { name: "Discord", text: "Join the community", url: "https://discord.com/invite/NKcxKnMBG", type: "discord" },
+  { name: "Discord", text: "Join the community", url: "https://discord.gg/CY2YudpqAm", type: "discord" },
   { name: "Instagram", text: "Behind the scenes & updates", url: "https://www.instagram.com/mooregames96/", type: "instagram" },
   { name: "Facebook", text: "Follow for news & updates", url: "https://www.facebook.com/mooregames96", type: "facebook" },
   {
